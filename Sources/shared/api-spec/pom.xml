@@ -1,0 +1,101 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.ospgames.goh</groupId>
+		<artifactId>shared</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<groupId>com.ospgames.goh.shared</groupId>
+	<artifactId>api-spec</artifactId>
+	<packaging>jar</packaging>
+	
+	<version>1.0-SNAPSHOT</version>
+	<name>GOH specification api ice</name>
+	<dependencies>
+		<!-- Add additional dependencies if needed -->
+		<dependency>
+			<groupId>com.zeroc.ice</groupId>
+			<artifactId>ice-java</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+        <plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+					<!-- Workaround:
+					The Exec-Plugin creates the Working directory if
+					it does not exists. We have make sure the 
+					target/generated directory exists before the 
+					slice2java will be executed. So we execute an
+					echo command within the generated directory.
+					The echo command exists on all target plattforms.
+					As this goals will be executed more than one time
+					a mkdir would be failed. as in the second execution
+					the directory already exists.
+					 -->
+					<execution>
+						<!-- Configuration within the execution to
+						     allow different configurations per plugin.
+						     Otherwise only the first configuration
+						     will be executed but maybe multiple times
+						 -->
+						<configuration>
+							<executable>echo</executable>
+							<workingDirectory>
+								${basedir}/target/generated
+							</workingDirectory>
+							<arguments>
+								<argument>generated ${basedir}/target/generated</argument>
+							</arguments>
+						</configuration>
+
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<phase>generate-sources</phase>
+						<id>Create Generation Directory</id>
+					</execution>
+
+					<execution>
+						<configuration>
+							<executable>slice2java</executable>
+							<workingDirectory>
+								${basedir}/src/main/slice
+							</workingDirectory>
+							<arguments>
+								<argument>--output-dir</argument>
+								<argument>
+									${basedir}/target/generated
+								</argument>
+								<!--               Attention                   -->
+								<!-- These files are included manually.        -->
+								<!-- An asterisk * does not work, java is      -->
+								<!-- interpretating the asterisk as something. -->
+								<argument>goh_generic.ice</argument>
+                                <argument>goh_space.ice</argument>
+                                <argument>goh_fleet.ice</argument>
+								<!-- <argument>goh_gameengine.ice</argument> -->
+							</arguments>
+						</configuration>
+
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<phase>generate-sources</phase>
+						<id>Generate Java Sources from ICE</id>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+
+		<sourceDirectory>${basedir}/target/generated</sourceDirectory>
+	</build>
+
+
+</project>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ospgames</groupId>
+        <artifactId>goh</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.ospgames.goh</groupId>
+    <artifactId>server</artifactId>
+
+    <packaging>pom</packaging>
+
+    <name>Game of Honor - Server</name>
+
+    <description>Server of Game of Honor Project - a strategy game set in David Weber's Honorverse</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            
+        </plugins>
+    </build>
+
+    <modules>
+        <module>applications</module>
+        <module>server-framework</module>
+    </modules>
+</project>

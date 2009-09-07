@@ -1,0 +1,10 @@
+<metadata>
+  <groupId>com.zeroc.ice</groupId>
+  <artifactId>ice-java</artifactId>
+  <version>3.3.1</version>
+  <versioning>
+    <versions>
+      <version>3.3.1</version>
+    </versions>
+  </versioning>
+</metadata>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ospgames</groupId>
+    <artifactId>goh</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
+    <name>Game of Honor</name>
+    <description>Game of Honor Project - a strategy game set in David Weber's Honorverse</description>
+
+    <developers>
+        <developer>
+            <id>wkempa</id>
+            <name>Wilko Kempa</name>
+            <email>wilko.kempa@googlemail.com</email>
+           <roles>
+                <role>TCD, Software Development Server</role>
+            </roles>
+         </developer>
+
+        <developer>
+            <id>dtamberg</id>
+            <name>Daniel Tamberg</name>
+            <email>tamberg@openskyprojects.de</email>
+            <organization>Open Sky Projects</organization>
+            <organizationUrl>http://www.openskyprojects.de</organizationUrl>
+            <roles>
+                <role>Software Development Java/JOGL Client</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>TBD</system>
+        <url></url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>TBD</system>
+        <url></url>
+    </ciManagement>
+
+   <repositories>
+        <repository>
+            <id>Contribution</id>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <url>file://${env.M2_CONTRIB}/repository</url>
+        </repository>
+    </repositories>
+
+   <modules>
+        <module>client-java</module>
+        <module>server</module>
+        <module>shared</module>
+   </modules>
+
+</project>

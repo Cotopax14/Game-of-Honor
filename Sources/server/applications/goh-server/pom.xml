@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ospgames.goh.server</groupId>
+        <artifactId>applications</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.ospgames.goh.server.applications</groupId>
+    <artifactId>goh-server</artifactId>
+
+    <packaging>jar</packaging>
+
+    <name>Game of Honor - Server Applications - GOH Server</name>
+
+    
+</project>

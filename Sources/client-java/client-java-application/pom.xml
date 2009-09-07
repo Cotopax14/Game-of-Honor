@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ospgames.goh</groupId>
+        <artifactId>client-java</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.ospgames.goh.client-java</groupId>
+    <artifactId>client-java-application</artifactId>
+
+    <packaging>jar</packaging>
+
+    <name>Game of Honor - Java Client Application</name>
+
+    <description>Java Client Application of Game of Honor Project - a strategy game set in David Weber's Honorverse</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.java.jogl</groupId>
+            <artifactId>jogl</artifactId>
+            <version>${jogl.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.java.jogl</groupId>
+            <artifactId>jogl-native</artifactId>
+            <version>${jogl.version}</version>
+            <classifier>${build.type}</classifier>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.java.gluegen-rt</groupId>
+            <artifactId>gluegen-rt</artifactId>
+            <version>${gluegen-rt.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.java.gluegen-rt</groupId>
+            <artifactId>gluegen-rt-native</artifactId>
+            <version>${gluegen-rt.version}</version>
+            <classifier>${build.type}</classifier>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>net.java.jogl</groupId>
+                                    <artifactId>jogl-native</artifactId>
+                                    <version>${jogl.version}</version>
+                                    <classifier>${build.type}</classifier>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>net.java.gluegen-rt</groupId>
+                                    <artifactId>gluegen-rt-native</artifactId>
+                                    <version>${gluegen-rt.version}</version>
+                                    <classifier>${build.type}</classifier>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>java.library.path</name>
+                            <value>${project.build.directory}/lib</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- Build Type -->
+    <profiles>
+        <profile>
+            <id>win32</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <build.type>586-windows</build.type>
+            </properties>
+        </profile>
+    </profiles>
+
+    <!-- Common version -->
+    <properties>
+        <jogl.version>1.1.1a</jogl.version>
+        <gluegen-rt.version>1.1.1a</gluegen-rt.version>
+    </properties>
+
+</project>

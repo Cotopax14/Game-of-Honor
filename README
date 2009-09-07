@@ -1,0 +1,35 @@
+Game of Honor Project
+================================
+
+Initial Directory Layout
+================================
+Contributions
+   \repository				Maven Repository containing code not bundled in the central ibilio maven repository
+   
+Sources								All sub folders follow the maven directory structure (src/main/java..)
+   
+   	\client-java       						Java Client root directory
+   		\adapter										Adapter to backend services, ..
+   		\client-java-application 		Project containing main application code and config to package application
+   		\client-shared							Shared code utils of the client
+   		\dialogs										TBD
+   		\game-logic									TBD
+
+   	\server            						Server root directory (also Java based)
+   		\adapter
+   			\persistence							Hibernate
+   		\server-application					Main Server Web Application and config to build and package
+   		\core
+   			\gameengine								Game engine simulation the game world
+   				\gameengine-api					Interface spec of game engine
+   				\gameengine-impl				Implementation of the game engine
+   			\battleengine							Processing the battles
+   				\battleengine-api				Interface spec of battle engine
+   				\battleengine-impl			Implementation of battle engine
+   		\server-framework					  Shared stuff by all server components (e.g. base exceptions..)									
+   
+   	\shared            						Shared stuff e.g. slice interface spec and generated sources
+   	  \bom												Business object model common types
+   	  \gameengine-api						  Slice Defintion of game engine interface
+   	  \battleengine-api           Slice Definition of battle engine interface
+   	   
