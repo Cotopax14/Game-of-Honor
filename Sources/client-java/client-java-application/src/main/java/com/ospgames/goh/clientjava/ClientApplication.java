@@ -6,8 +6,6 @@ import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 import java.util.*;
-import java.lang.Math;
-import java.lang.System.*;
 
 public class ClientApplication
 {
