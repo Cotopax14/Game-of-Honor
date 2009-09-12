@@ -7,6 +7,9 @@ package com.ospgames.goh.clientjava;
  * Time: 14:28:35
  * To change this template use File | Settings | File Templates.
  */
-public class checkEncoding {
+public class CheckEncoding {
+
+    public static void main(String[] args) {
     System.out.println("Umlautetest: ÄÖÜßäöü");
+    }
 }
