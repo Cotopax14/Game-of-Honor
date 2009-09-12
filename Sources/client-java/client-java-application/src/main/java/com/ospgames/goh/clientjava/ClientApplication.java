@@ -14,7 +14,7 @@ public class ClientApplication
         long primeNumberCheckResult;
 
         Scanner in = new Scanner(System.in);
-        System.out.println("Bitte gib eine Zahl ein, die Du f¸r eine Primzahl h‰ltst: ");
+        System.out.println("Bitte gib eine Zahl ein, die Du f√ºr eine Primzahl h√§ltst: ");
         numberToCheck = in.nextLong();
         primeNumberCheckResult = isPrimeNumber(numberToCheck);
 
@@ -22,7 +22,7 @@ public class ClientApplication
             System.out.println("Gewonnen! Die Zahl "+numberToCheck+" ist eine Primzahl!");
         }
         else{
-            System.out.println("Sorry! Die Zahl "+numberToCheck+" ist keine Primzahl! Sie l‰sst sich z.B. durch "+primeNumberCheckResult+" teilen.");
+            System.out.println("Sorry! Die Zahl "+numberToCheck+" ist keine Primzahl! Sie l√§sst sich z.B. durch "+primeNumberCheckResult+" teilen.");
             System.out.println(numberToCheck+" / "+primeNumberCheckResult+" = "+(double)numberToCheck/(double)primeNumberCheckResult);
         }
 
@@ -55,7 +55,7 @@ public class ClientApplication
 
         for (i=3; i<=maxNumber; i+=2){
 
-//            System.out.println("Zu pr¸fende Zahl: "+i);
+//            System.out.println("Zu pr√ºfende Zahl: "+i);
 
             primeNumberRuledOut=false;
 
