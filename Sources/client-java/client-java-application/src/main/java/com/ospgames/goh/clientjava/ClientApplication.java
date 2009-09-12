@@ -1,75 +1,92 @@
 package com.ospgames.goh.clientjava;
 
+import com.sun.opengl.util.GLUT;
 import javax.media.opengl.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
+import java.util.*;
+import java.lang.Math;
+import java.lang.System.*;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Daniel
- * Date: 03.09.2009
- * Time: 17:32:04
- * To change this template use File | Settings | File Templates.
- */
-public class ClientApplication {
+public class ClientApplication
+{
+    public static void main(String[] args){
+        long numberToCheck;
+        long primeNumberCheckResult;
 
-    public static void main(String[] args) {
-        Frame frame = new Frame();
-        GLCanvas canvas = new GLCanvas();
-        canvas.addGLEventListener(new Listener());
-        frame.setUndecorated(true);
-        frame.add(canvas);
-        frame.setSize(1, 1);
-        frame.setVisible(true);
+        Scanner in = new Scanner(System.in);
+        System.out.println("Bitte gib eine Zahl ein, die Du für eine Primzahl hältst: ");
+        numberToCheck = in.nextLong();
+        primeNumberCheckResult = isPrimeNumber(numberToCheck);
+
+        if (primeNumberCheckResult==0){
+            System.out.println("Gewonnen! Die Zahl "+numberToCheck+" ist eine Primzahl!");
+        }
+        else{
+            System.out.println("Sorry! Die Zahl "+numberToCheck+" ist keine Primzahl! Sie lässt sich z.B. durch "+primeNumberCheckResult+" teilen.");
+            System.out.println(numberToCheck+" / "+primeNumberCheckResult+" = "+(double)numberToCheck/(double)primeNumberCheckResult);
+        }
+
+        System.out.println("\nAlle Primzahlen bis "+numberToCheck+": \n2\n3");
+        allPrimeNumbers(numberToCheck);
     }
 
-    static class Listener implements GLEventListener {
-        public void init(GLAutoDrawable drawable) {
-            GL gl = drawable.getGL();
-            System.out.println("GL vendor: " + gl.glGetString(GL.GL_VENDOR));
-            System.out.println("GL version: " + gl.glGetString(GL.GL_VERSION));
-            System.out.println("GL renderer: " + gl.glGetString(GL.GL_RENDERER));
-            System.out.println("GL extensions:");
-            String[] extensions = gl.glGetString(GL.GL_EXTENSIONS).split(" ");
-            int i = 0;
-            while (i < extensions.length) {
-                System.out.print("  ");
-                String ext = extensions[i++];
-                System.out.print(ext);
-                if (i < extensions.length) {
-                    for (int j = 0; j < (40 - ext.length()); j++) {
-                        System.out.print(" ");
-                    }
-                    System.out.println(extensions[i++]);
-                } else {
-                    System.out.println();
+    public static long isPrimeNumber(long numberToCheck){
+        long i;
+        for (i=2; i<(int)Math.sqrt(numberToCheck); i++){
+            if (Math.floor((double)(numberToCheck/i)) == (double)numberToCheck/i){
+                return(i);
+            }
+        }
+        return(0);
+    }
+
+    public static long allPrimeNumbers(long maxNumber){
+        int j=0, k=0;
+        int i=0;
+        int primeNumbers[] = new int[100000];
+        primeNumbers[0]=2;
+        primeNumbers[1]=3;
+        long startTime=System.currentTimeMillis();
+        long endTime;
+
+        int numberOfPrimeNumbers=2;
+        int firstNumberOutsidePrimeNumberRange=0;
+        boolean primeNumberRuledOut=false;
+
+        for (i=3; i<=maxNumber; i+=2){
+
+//            System.out.println("Zu prüfende Zahl: "+i);
+
+            primeNumberRuledOut=false;
+
+            for (j=0; j<numberOfPrimeNumbers; j++){
+
+//                System.out.print(primeNumbers[j]+" - ");
+
+                if (Math.floor((double)(i/primeNumbers[j])) == (double)i/primeNumbers[j]){
+                    primeNumberRuledOut=true;
                 }
             }
-            runExit();
-        }
 
-        public void display(GLAutoDrawable drawable) {
-        }
+//            System.out.println();
 
-        public void reshape(GLAutoDrawable drawable, int x, int y, int w, int h) {
-        }
-
-        public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
-        }
-    }
-
-    private static void runExit() {
-        // Note: calling System.exit() synchronously inside the draw,
-        // reshape or init callbacks can lead to deadlocks on certain
-        // platforms (in particular, X11) because the JAWT's locking
-        // routines cause a global AWT lock to be grabbed. Run the
-        // exit routine in another thread.
-        new Thread(new Runnable() {
-            public void run() {
-                System.exit(0);
+            for (k=primeNumbers[j-1]; k<(int)Math.sqrt(i); k+=2){
+                if (Math.floor((double)(i/k)) == (double)i/k){
+                    primeNumberRuledOut=true;
+                }
             }
-        }).start();
 
+            if (!primeNumberRuledOut){
+//                System.out.println(i);
+                primeNumbers[numberOfPrimeNumbers++]=i;
+            }
+        }
 
-        System.out.println("Hello World");
+        endTime=System.currentTimeMillis();
+
+        System.out.println("Insgesamt "+numberOfPrimeNumbers+" Primzahlen gefunden in "+(endTime-startTime)+" Millisekunden = "+(endTime-startTime)/1000+" Sekunden");
+        return(numberOfPrimeNumbers);
     }
 }
