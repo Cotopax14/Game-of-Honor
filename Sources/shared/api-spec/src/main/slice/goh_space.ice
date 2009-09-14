@@ -30,15 +30,15 @@ module ospgames {
 
       /** Space Type */
       enum SpaceType {
-        	    NORMAL,  /** Normal space */
-        	    HYPER   /** Hyper space */
+        	NORMAL, /** Normal space */
+        	HYPER   /** Hyper space */
       };
 
-    class StarType {
-        string name;                /** unique name of this type  */
-        long   resources;           /** resources to dig via time */
-        long   hyperlimitRadius;    /** radius of the hyperlimit in m */
-        long   outerHabitableRadius;/** outer radius of the habitable zone in m */
+      class StarType {
+            string name;                /** unique name of this type  */
+            long   resources;           /** resources to aquire per unit of time */
+            long   hyperlimitRadius;    /** radius of the hyperlimit in m */
+            long   outerHabitableRadius;/** outer radius of the habitable zone in m */
       };
 
       class Star {
@@ -50,19 +50,22 @@ module ospgames {
 
 
       /** Sequence of stars */
-	  ["java:type:java.util.ArrayList<Star>:java.util.List<Star>"]
+	  ["java:type:java.util.ArrayList<com.ospgames.goh.space.Star>:java.util.List<com.ospgames.goh.space.Star>"]
 	  sequence<Star>   StarSeq;
-
 
 
       /** TO BE DISCUSSED: might be structure of the specific domain
           e.g. owner and building colony management */
       // struct StarVariableData {
-      //   long           starId;     /** id of the star */
-      //  Player          owner;     /** owner of this star system */
-      //  BuildingSeq buildings;     /** buildings improving this star system */
-      //  long   LastBattleTime;     /** last time of a fight at this system  */
+      //  long           starId;     /** id of the star */
+      //  Player          owner;     /** owner of this star system, null if none */
+      //  BuildingSeq buildings;     /** buildings improving this star system, empty list if none */
+      //  long   LastBattleTime;     /** last time of a fight at this system, 0 if none  */
       // };
+
+
+      
+
 
     }; // space module
   }; // goh module

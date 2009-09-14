@@ -44,9 +44,6 @@ module ospgames {
       };
 
 
-
-      
-
     }; // generic
   }; // goh
 }; // ospgames

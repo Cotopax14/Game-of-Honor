@@ -20,7 +20,11 @@
     <description>Server Framework of Game of Honor Project - a strategy game set in David Weber's Honorverse</description>
 
     <dependencies>
-        
+        <dependency>
+            <groupId>com.zeroc.ice</groupId>
+            <artifactId>ice-java</artifactId>
+            <version>3.3.1</version>
+        </dependency>
     </dependencies>
 
     

@@ -32,7 +32,7 @@ module ospgames {
        */
 
 
-      struct ShipType {
+      class ShipType {
         string name;         /** unique name of this ship type */
         long   sensors;      /** max Sensor Strength     */
         long   attackPower;  /** max Attack power        */
@@ -45,7 +45,7 @@ module ospgames {
         long   mass;         /** in 1.000 t          */
       };
 
-      struct Ship {
+      class Ship {
 
         ShipType type;       /** the type of this ship */
         /** How do we detect change in space ? */
@@ -61,7 +61,7 @@ module ospgames {
       ["java:type:java.util.ArrayList<Ship>:java.util.List<Ship>"]
       sequence<Ship>      ShipSeq;
 
-      struct ShipGroup {
+      class ShipGroup {
           string              name;
           ShipSeq            ships;
       };
@@ -69,6 +69,11 @@ module ospgames {
       /** Sequence of ship groups */
       ["java:type:java.util.ArrayList<ShipGroup>:java.util.List<ShipGroup>"]
       sequence<ShipGroup>      ShipGroupSeq;
+
+
+
+
+
 
     }; // fleet module
   }; // goh module

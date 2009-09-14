@@ -1,0 +1,36 @@
+Beschreibt wie ein Spiel erstellt und gestartet wird.
+
+Ein Spieler muss einen Account-Namen und ein Passwort im System haben um Spielen zu können.
+Initial wird dieses fest auf dem Server hinterlegt.
+
+Das Spiel enthält eine Match-making Funktion um Spieler möglichst schnell zum Spiel zu bringen.
+Das Match-Making erfolgt über eine Reihe von Kriterien:
+
+Spielerzuordnung:
+-Manueller Beitritt
+-Automatisches Beitreten
+
+Spieletypen:
+-Kleine Galaxy 50 Sterne 1-1
+-Große Galaxy 100 Sterne 2-2
+
+Initial gibt es nur die Option "Automatisches Beitreten" sie wird für alle Spieler automatisch gewählt.
+>Automatisches Beitreten: der Spieler wählt Typen von Spielen die er prinzipiell Spielen würde,
+er wird automatisch dem nächsten startbaren Spiel zugeordnet, für das sich genügend Spieler registriert haben.
+
+Spieltypen werden nach gewissen Vorgaben erzeugt später wird der Spieler diese Konfigurieren können,
+Initial gibt es genau einen Spieltyp der automatisch ausgewählt wird.
+>Kleine Galaxy 1-1: Kugelsternhaufen mit 50 Sternen 4 mögliche Startpositionen, zwei Spieler
+
+Wartet ein Spieler auf eine Spielzuordnung befindet er sich in einer Lobby in der er
+seine Wartezeit vergangene Zeit und die Spielerzuordnung zu möglichen Spieltypen sehen kann.
+
+Wird das Spiel gestartet werden initial die Infos zum Spielesetup angezeigt und ein Counter läuft von
+10-1 dann startet das Spiel alle Clients erhalten die Spielwelt-Infos und können von nun an Kommandos geben.
+
+
+bool login(userName, password)
+List<GameConfiguration> listAutomatchGameConfigurations()
+registerForGameTypes(Player* player, GameListener* listener, List<GameConfigurations> selectedConfigs);
+
+gameCountDown(long timeLeft)
