@@ -42,13 +42,56 @@
 
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.ospgames.goh.server.application.GohServer</mainClass>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                </configuration>
+
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/install.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <excludes>
+                    <exclude>arguments.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/scripts</directory>
+                <filtering>true</filtering>
+                <targetPath>../scripts</targetPath>
             </resource>
         </resources>
     </build>
+
 
 
     <profiles>
@@ -66,6 +109,7 @@
                 <logging.root.path>c:/temp/</logging.root.path>
                 <logging.root.path.test>c:/temp/</logging.root.path.test>
                 <root.log.level>info</root.log.level>
+                <log.level>debug</log.level>
                 <max.logfile.size>1000000</max.logfile.size>
                 <max.logbackup.index>5</max.logbackup.index>
             </properties>
