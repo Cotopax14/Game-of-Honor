@@ -1,0 +1,29 @@
+<assembly>
+    <id>install</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <!-- include filtered scripts-->
+        <fileSet>
+            <outputDirectory>/</outputDirectory>
+            <directory>target/scripts</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>/config</outputDirectory>
+            <directory>src/main/config</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>/natives</outputDirectory>
+            <directory>target/natives</directory>
+        </fileSet>
+    </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>/libs</outputDirectory>
+            <unpack>false</unpack>
+            <scope>runtime</scope>
+        </dependencySet>
+    </dependencySets>
+</assembly>

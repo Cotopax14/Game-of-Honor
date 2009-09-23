@@ -19,85 +19,101 @@
 
     <description>Java Client Application of Game of Honor Project - a strategy game set in David Weber's Honorverse</description>
 
+    <repositories>
+
+        <repository>
+            <id>b2s-repo</id>
+            <url>http://b2s-repo.googlecode.com/svn/trunk/mvn-repo</url>
+        </repository>
+
+    </repositories>
+
+
+
     <dependencies>
+
         <dependency>
-            <groupId>net.java.jogl</groupId>
-            <artifactId>jogl</artifactId>
-            <version>${jogl.version}</version>
-            <scope>compile</scope>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-debug</artifactId>
+            <version>${lwjgl.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>net.java.jogl</groupId>
-            <artifactId>jogl-native</artifactId>
-            <version>${jogl.version}</version>
-            <classifier>${build.type}</classifier>
-            <scope>runtime</scope>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-jinput</artifactId>
+            <version>${lwjgl.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>net.java.gluegen-rt</groupId>
-            <artifactId>gluegen-rt</artifactId>
-            <version>${gluegen-rt.version}</version>
-            <scope>compile</scope>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-native</artifactId>
+            <version>${lwjgl.version}</version>
+            <classifier>${platform}</classifier>
         </dependency>
-        <dependency>
-            <groupId>net.java.gluegen-rt</groupId>
-            <artifactId>gluegen-rt-native</artifactId>
-            <version>${gluegen-rt.version}</version>
-            <classifier>${build.type}</classifier>
-            <scope>runtime</scope>
-        </dependency>
+
+
         <dependency>
             <groupId>com.ospgames.goh.shared</groupId>
             <artifactId>api-spec</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
                 </configuration>
             </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>org.lwjgl</groupId>
+                            <artifactId>lwjgl-native</artifactId>
+                            <version>${lwjgl.version}</version>
+                            <type>jar</type>
+                            <classifier>${platform}</classifier>
+                            <outputDirectory>${project.build.directory}/natives</outputDirectory>
+                            <overWrite>true</overWrite>
+                        </artifactItem>
+                    </artifactItems>
+                </configuration>
                 <executions>
                     <execution>
                         <id>unpack</id>
-                        <phase>generate-sources</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>net.java.jogl</groupId>
-                                    <artifactId>jogl-native</artifactId>
-                                    <version>${jogl.version}</version>
-                                    <classifier>${build.type}</classifier>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>net.java.gluegen-rt</groupId>
-                                    <artifactId>gluegen-rt-native</artifactId>
-                                    <version>${gluegen-rt.version}</version>
-                                    <classifier>${build.type}</classifier>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.ospgames.goh.clientjava.ClientApplication</mainClass>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                </configuration>
+
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -110,10 +126,41 @@
                     </systemProperties>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/install.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
+
+
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/scripts</directory>
+                <filtering>true</filtering>
+                <targetPath>../scripts</targetPath>
+            </resource>
+            <resource>
+                <directory>src/main/config</directory>
                 <filtering>true</filtering>
             </resource>
         </resources>
@@ -127,7 +174,8 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <build.type>586-windows</build.type>
+                <platform>win32</platform>
+                <lwjgl.version>2.1.0</lwjgl.version>
             </properties>
         </profile>
 
@@ -151,10 +199,5 @@
         </profile>
     </profiles>
 
-    <!-- Common version -->
-    <properties>
-        <jogl.version>1.1.1a</jogl.version>
-        <gluegen-rt.version>1.1.1a</gluegen-rt.version>
-    </properties>
 
 </project>

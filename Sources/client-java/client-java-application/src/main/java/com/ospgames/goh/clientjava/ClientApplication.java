@@ -1,90 +1,154 @@
 package com.ospgames.goh.clientjava;
 
-import com.sun.opengl.util.GLUT;
-import javax.media.opengl.*;
-import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowAdapter;
-import java.util.*;
+import org.lwjgl.Sys;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+
+
 
 public class ClientApplication
 {
-    public static void main(String[] args){
-        long numberToCheck;
-        long primeNumberCheckResult;
+    /** Game title */
+    public static final String GAME_TITLE = "Game of Honor";
 
-        Scanner in = new Scanner(System.in);
-        System.out.println("Bitte gib eine Zahl ein, die Du für eine Primzahl hältst: ");
-        numberToCheck = in.nextLong();
-        primeNumberCheckResult = isPrimeNumber(numberToCheck);
+    /** Desired frame time */
+    private static final int FRAMERATE = 60;
 
-        if (primeNumberCheckResult==0){
-            System.out.println("Gewonnen! Die Zahl "+numberToCheck+" ist eine Primzahl!");
+
+    /** Exit the game */
+    private static boolean finished;
+
+    /** Angle of rotating square */
+    private static float angle;
+
+    /**
+     * Application init
+     * @param args Commandline args
+     */
+    public static void main(String[] args) {
+        boolean fullscreen = (args.length == 1 && args[0].equals("-fullscreen"));
+
+        try {
+            init(fullscreen);
+            run();
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            Sys.alert(GAME_TITLE, "An error occured and the game will exit.");
+        } finally {
+            cleanup();
         }
-        else{
-            System.out.println("Sorry! Die Zahl "+numberToCheck+" ist keine Primzahl! Sie lässt sich z.B. durch "+primeNumberCheckResult+" teilen.");
-            System.out.println(numberToCheck+" / "+primeNumberCheckResult+" = "+(double)numberToCheck/(double)primeNumberCheckResult);
-        }
-
-        System.out.println("\nAlle Primzahlen bis "+numberToCheck+": \n2\n3");
-        allPrimeNumbers(numberToCheck);
+        System.exit(0);
     }
 
-    public static long isPrimeNumber(long numberToCheck){
-        long i;
-        for (i=2; i<(int)Math.sqrt(numberToCheck); i++){
-            if (Math.floor((double)(numberToCheck/i)) == (double)numberToCheck/i){
-                return(i);
+    /**
+     * Initialise the game
+     * @throws Exception if init fails
+     */
+    private static void init(boolean fullscreen) throws Exception {
+        // Create a fullscreen window with 1:1 orthographic 2D projection (default)
+        Display.setTitle(GAME_TITLE);
+        Display.setFullscreen(fullscreen);
+
+        // Enable vsync if we can (due to how OpenGL works, it cannot be guarenteed to always work)
+        Display.setVSyncEnabled(true);
+
+        // Create default display of 640x480
+        Display.create();
+
+        // Put the window into orthographic projection mode with 1:1 pixel ratio.
+        // We haven't used GLU here to do this to avoid an unnecessary dependency.
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0.0, Display.getDisplayMode().getWidth(), 0.0, Display.getDisplayMode().getHeight(), -1.0, 1.0);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glLoadIdentity();
+        GL11.glViewport(0, 0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight());
+    }
+
+    /**
+     * Runs the game (the "main loop")
+     */
+    private static void run() {
+
+        while (!finished) {
+            // Always call Window.update(), all the time - it does some behind the
+            // scenes work, and also displays the rendered output
+            Display.update();
+
+            // Check for close requests
+            if (Display.isCloseRequested()) {
+                finished = true;
             }
-        }
-        return(0);
-    }
 
-    public static long allPrimeNumbers(long maxNumber){
-        int j=0, k=0;
-        int i=0;
-        int primeNumbers[] = new int[100000];
-        primeNumbers[0]=2;
-        primeNumbers[1]=3;
-        long startTime=System.currentTimeMillis();
-        long endTime;
+            // The window is in the foreground, so we should play the game
+            else if (Display.isActive()) {
+                logic();
+                render();
+                Display.sync(FRAMERATE);
+            }
 
-        int numberOfPrimeNumbers=2;
-        int firstNumberOutsidePrimeNumberRange=0;
-        boolean primeNumberRuledOut=false;
+            // The window is not in the foreground, so we can allow other stuff to run and
+            // infrequently update
+            else {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                }
+                logic();
 
-        for (i=3; i<=maxNumber; i+=2){
-
-//            System.out.println("Zu prüfende Zahl: "+i);
-
-            primeNumberRuledOut=false;
-
-            for (j=0; j<numberOfPrimeNumbers; j++){
-
-//                System.out.print(primeNumbers[j]+" - ");
-
-                if (Math.floor((double)(i/primeNumbers[j])) == (double)i/primeNumbers[j]){
-                    primeNumberRuledOut=true;
+                // Only bother rendering if the window is visible or dirty
+                if (Display.isVisible() || Display.isDirty()) {
+                    render();
                 }
             }
+        }
+    }
 
-//            System.out.println();
+    /**
+     * Do any game-specific cleanup
+     */
+    private static void cleanup() {
+        // Close the window
+        Display.destroy();
+    }
 
-            for (k=primeNumbers[j-1]; k<(int)Math.sqrt(i); k+=2){
-                if (Math.floor((double)(i/k)) == (double)i/k){
-                    primeNumberRuledOut=true;
-                }
-            }
-
-            if (!primeNumberRuledOut){
-//                System.out.println(i);
-                primeNumbers[numberOfPrimeNumbers++]=i;
-            }
+    /**
+     * Do all calculations, handle input, etc.
+     */
+    private static void logic() {
+        // Example input handler: we'll check for the ESC key and finish the game instantly when it's pressed
+        if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+            finished = true;
         }
 
-        endTime=System.currentTimeMillis();
-
-        System.out.println("Insgesamt "+numberOfPrimeNumbers+" Primzahlen gefunden in "+(endTime-startTime)+" Millisekunden = "+(endTime-startTime)/1000+" Sekunden");
-        return(numberOfPrimeNumbers);
+        // Rotate the square
+        angle += 2.0f % 360;
     }
+
+    /**
+     * Render the current frame
+     */
+    private static void render() {
+        // clear the screen
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_STENCIL_BUFFER_BIT);
+
+        // center square according to screen size
+        GL11.glPushMatrix();
+        GL11.glTranslatef(Display.getDisplayMode().getWidth() / 2, Display.getDisplayMode().getHeight() / 2, 0.0f);
+
+        // rotate square according to angle
+        GL11.glRotatef(angle, 0, 0, 1.0f);
+
+        // render the square
+        GL11.glBegin(GL11.GL_QUADS);
+        GL11.glVertex2i(-50, -50);
+        GL11.glVertex2i(50, -50);
+        GL11.glVertex2i(50, 50);
+        GL11.glVertex2i(-50, 50);
+        GL11.glEnd();
+
+        GL11.glPopMatrix();
+    }
+
 }
