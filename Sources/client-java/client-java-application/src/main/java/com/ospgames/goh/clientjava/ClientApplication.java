@@ -17,9 +17,9 @@ public class ClientApplication
     /** Game title */
     public static final String GAME_TITLE = "Game of Honor";
 
-        private boolean done = false;
+    private boolean done = false;
     private boolean fullscreen = false;
-    private final String windowTitle = "NeHe's OpenGL Lesson 5 for LWJGL (3D Shapes)";
+    private final String windowTitle = GAME_TITLE;
     private boolean f1 = false;
 
     private float rtri;                 // Angle For The Triangle ( NEW )
@@ -230,7 +230,8 @@ public class ClientApplication
         GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, (FloatBuffer)lightBuffer.asFloatBuffer().put(LIGHT_POS).flip());         // Position The Light
 
         GL11.glEnable(GL11.GL_LIGHT0);                                // Enable Light 0
-        GL11.glEnable(GL11.GL_LIGHTING);                              // Enable Lighting
+        GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL11.GL_COLOR_MATERIAL);// Enable Material Lighting
     }
 
     private void renderScene() {
@@ -240,7 +241,7 @@ public class ClientApplication
         GL11.glLoadIdentity();                          // Reset The Current Modelview Matrix
 
         GL11.glTranslatef(0,0,-5.5f );
-        GL11.glColor3f(1.0f, 1.0f, 0.0f);
+        GL11.glColor3f(0.7f, 0.7f, 0.0f);
         mSphere.draw(0.35f, 32, 16);
 
     }
