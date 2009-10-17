@@ -40,6 +40,12 @@
 
         <dependency>
             <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-util</artifactId>
+            <version>${lwjgl.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl-jinput</artifactId>
             <version>${lwjgl.version}</version>
         </dependency>

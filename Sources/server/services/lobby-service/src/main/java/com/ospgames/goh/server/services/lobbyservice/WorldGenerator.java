@@ -17,9 +17,15 @@ public class WorldGenerator {
 
 
     private int mNumberOfStars = 100;
+    private long mScale = 3;
+    private double mMinDist = 2.5d;
+    private double mMaxDist = 6.5d;
+    private double mRadius = 100.0d;
 
 
-
+    private Vector3D getScaledVector3D(Position pos) {
+        return new Vector3D(Math.round(pos.x*mScale), Math.round(pos.y*mScale), Math.round(pos.z*mScale));
+    }
 
     /**
      * Create a random generated map of stars according to the parameters
@@ -28,14 +34,13 @@ public class WorldGenerator {
      */
     public List<Star> getStars() {
 
-        SpherePositionCalculator posGen = new SpherePositionCalculator(100.0d, 2.5d, 6.5);
+        SpherePositionCalculator posGen = new SpherePositionCalculator(mRadius, mMinDist, mMaxDist);
         List<Position> positions = posGen.getRandomPositions(mNumberOfStars);
-
 
         int i=0;
         List<Star> stars = new ArrayList<Star>(mNumberOfStars);
         for (Position p : positions) {
-            stars.add(new Star(i++, "Star"+i, new Vector3D(Math.round(p.x*LY), Math.round(p.y*LY), Math.round(p.z*LY)), G));
+            stars.add(new Star(i++, "Star"+i, getScaledVector3D(p), G));
         }
 
         return stars;
