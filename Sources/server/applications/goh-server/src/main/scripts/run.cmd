@@ -6,16 +6,16 @@ goto end
 
 :javaok
 
-set CLIENT_CLASSPATH=
+set SERVER_CLASSPATH=
 for %%G in (./libs/*.jar) do (call :s_do_set %%G)
 
-echo CLIENT_CLASSPATH: %CLIENT_CLASSPATH%
+echo SERVER_CLASSPATH: %SERVER_CLASSPATH%
 
-%JAVA_HOME%/bin/java -jar libs/${project.artifactId}-${project.version}.jar -classpath config;%CLIENT_CLASSPATH% %CLIENT_OPTIONS% %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11 %12 %13 %14 %15 %16
+%JAVA_HOME%/bin/java -jar libs/${project.artifactId}-${project.version}.jar -classpath config;%SERVER_CLASSPATH% %SERVER_OPTIONS% --Ice.Config=config/ice-config.properties %1 %2 %3 %4 %5 %6 %7 %8 %9 %10 %11 %12 %13 %14 %15 %16
 goto :end
 
 :s_do_set
-set CLIENT_CLASSPATH=%CLIENT_CLASSPATH%;./libs/%1
+set SERVER_CLASSPATH=%SERVER_CLASSPATH%;./libs/%1
 GOTO :eof
 
 :end

@@ -80,14 +80,15 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
-                <excludes>
-                    <exclude>arguments.properties</exclude>
-                </excludes>
             </resource>
             <resource>
                 <directory>src/main/scripts</directory>
                 <filtering>true</filtering>
                 <targetPath>../scripts</targetPath>
+            </resource>
+            <resource>
+                <directory>src/main/config</directory>
+                <filtering>true</filtering>
             </resource>
         </resources>
     </build>
