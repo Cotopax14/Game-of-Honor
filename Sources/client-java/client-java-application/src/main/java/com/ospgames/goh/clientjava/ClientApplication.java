@@ -24,6 +24,7 @@ public class ClientApplication
     private boolean f1 = false;
 
     private float sceneYAngle = 0;             // scene rotation angle around the Y axis
+	private float sceneXAngle = 0;             // scene rotation angle around the X axis
     private DisplayMode displayMode;
 
 	//*****************************************************************************************************************
@@ -73,6 +74,30 @@ public class ClientApplication
         if(!Keyboard.isKeyDown(Keyboard.KEY_F1)) {          // Is F1 Being Pressed?
             f1 = false;
         }
+
+		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
+			sceneYAngle -= 1f;
+			if (sceneYAngle < 0f) sceneYAngle = 359f;
+
+		}
+
+		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
+			sceneYAngle += 1f;
+			if (sceneYAngle > 360f) sceneYAngle = 1f; 
+		}
+
+		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
+			sceneXAngle -= 1f;
+			if (sceneXAngle < 0f) sceneXAngle = 359f;
+
+		}
+
+		if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
+			sceneXAngle += 1f;
+			if (sceneXAngle > 360f) sceneXAngle = 1f; 
+		}
+
+
     }
 
 	//*****************************************************************************************************************
@@ -215,6 +240,7 @@ public class ClientApplication
             GL11.glLoadIdentity();                          // Reset The Current Modelview Matrix
 			GL11.glTranslatef(0f, 0f, -52.5f);	
 			GL11.glRotatef(sceneYAngle,0.0f,1.0f,0.0f);
+			GL11.glRotatef(sceneXAngle,1.0f,0.0f,0.0f);		
 			GL11.glTranslatef(0f, 0f, 52.5f);	
             GL11.glTranslatef(starPositions[i][0], starPositions[i][1], starPositions[i][2]);
             GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);
@@ -222,8 +248,6 @@ public class ClientApplication
             mSphere.draw(0.5f, 20, 10);
 		}
 
-		sceneYAngle += 0.1;
-		if (sceneYAngle > 360) sceneYAngle = 0; 
 		// System.out.println("Scene Y angle: "+sceneYAngle);
     }
 
