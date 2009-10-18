@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Disk;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.glu.Sphere;
+import org.lwjgl.input.Mouse;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,6 +26,7 @@ public class ClientApplication
 
     private float sceneYAngle = 0;             // scene rotation angle around the Y axis
 	private float sceneXAngle = 0;             // scene rotation angle around the X axis
+	private float sceneDistance = 0;
     private DisplayMode displayMode;
 
 	//*****************************************************************************************************************
@@ -60,14 +62,30 @@ public class ClientApplication
     }
 
 	//*****************************************************************************************************************
-    private void mainloop() {
-        if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {       // Exit if Escape is pressed
+
+	// two variables needed to make the key's effect a smooth acceleration and deceleration
+	private static float keyboardAcceleration = 0.01f;
+	private boolean isRotateKeyPressed = false;
+
+	private void mainloop() {
+
+		// mouse movement variables
+		int mouseDeltaX;
+		int mouseDeltaY;
+		int mouseWheelDelta;
+
+		float fogStartAdjust = 0;
+
+        // *** escape key
+		if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {       // Exit if Escape is pressed
             done = true;
         }
         if(Display.isCloseRequested()) {                     // Exit if window is closed
             done = true;
         }
-        if(Keyboard.isKeyDown(Keyboard.KEY_F1) && !f1) {    // Is F1 Being Pressed?
+
+		// *** toggle fullscreen/windowed mode
+		if(Keyboard.isKeyDown(Keyboard.KEY_F1) && !f1) {    // Is F1 Being Pressed?
             f1 = true;                                      // Tell Program F1 Is Being Held
             switchMode();                                   // Toggle Fullscreen / Windowed Mode
         }
@@ -75,28 +93,79 @@ public class ClientApplication
             f1 = false;
         }
 
+		// *** rotate star field keys
 		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
-			sceneYAngle -= 1f;
+			sceneYAngle -= keyboardAcceleration;
 			if (sceneYAngle < 0f) sceneYAngle = 359f;
+
+			isRotateKeyPressed = true;
 
 		}
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
-			sceneYAngle += 1f;
-			if (sceneYAngle > 360f) sceneYAngle = 1f; 
+			sceneYAngle += keyboardAcceleration;
+			if (sceneYAngle > 360f) sceneYAngle = 1f;
+
+			isRotateKeyPressed = true;
 		}
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-			sceneXAngle -= 1f;
+			sceneXAngle -= keyboardAcceleration;
 			if (sceneXAngle < 0f) sceneXAngle = 359f;
+
+			isRotateKeyPressed = true;
 
 		}
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-			sceneXAngle += 1f;
-			if (sceneXAngle > 360f) sceneXAngle = 1f; 
+			sceneXAngle += keyboardAcceleration;
+			if (sceneXAngle > 360f) sceneXAngle = 1f;
+			isRotateKeyPressed = true;
 		}
 
+		if (isRotateKeyPressed){
+			keyboardAcceleration *= 1.15f;
+			if (keyboardAcceleration > 1) keyboardAcceleration = 1f;
+		}
+		else
+		{
+			keyboardAcceleration /= 1.25f;
+			if (keyboardAcceleration < 0.01f) keyboardAcceleration = 0.01f;
+
+		}
+
+		isRotateKeyPressed = false;
+
+		// *** rotate starfield if mouse is dragged
+		Mouse.next();
+
+		mouseDeltaX = Mouse.getEventDX();
+		mouseDeltaY = Mouse.getEventDY();
+
+		if (Mouse.isButtonDown(0)) {
+			sceneXAngle -= (float)mouseDeltaY/10f;
+			if (sceneXAngle > 360f) sceneXAngle = sceneXAngle % 360;
+			if (sceneXAngle < 360f) sceneXAngle = sceneXAngle % 360;
+
+			sceneYAngle += (float)mouseDeltaX/10f;
+			if (sceneYAngle > 360f) sceneYAngle = sceneYAngle % 360;
+			if (sceneYAngle < 360f) sceneYAngle = sceneYAngle % 360;
+
+			// System.out.println("Delta X:"+mouseDeltaX);
+			// System.out.println("Delta Y:"+mouseDeltaY);
+			// System.out.println();
+		}
+
+		mouseWheelDelta = Mouse.getDWheel();
+		sceneDistance -= (float)mouseWheelDelta/50;
+		if (sceneDistance > 400f) sceneDistance = 400f;
+		if (sceneDistance < -150f) sceneDistance = -150f;
+
+		if (sceneDistance >= 0) fogStartAdjust = sceneDistance; else fogStartAdjust = 0;
+		GL11.glFogf(GL11.GL_FOG_START, fogStartAdjust);      // adjust fog start depth
+		GL11.glFogf(GL11.GL_FOG_END, 125f+sceneDistance);   // adjust fog end depth
+
+		// System.out.println("Scene Distance:"+mouseWheelDelta);
 
     }
 
@@ -116,8 +185,8 @@ public class ClientApplication
         Display.setFullscreen(fullscreen);
         DisplayMode d[] = Display.getAvailableDisplayModes();
         for (int i = 0; i < d.length; i++) {
-            if (d[i].getWidth() == 1680
-                && d[i].getHeight() == 1050
+            if (d[i].getWidth() == 1280
+                && d[i].getHeight() == 1024
                 && d[i].getBitsPerPixel() == 32) {
                 displayMode = d[i];
                 break;
@@ -126,6 +195,9 @@ public class ClientApplication
         Display.setDisplayMode(displayMode);
         Display.setTitle(windowTitle);
         Display.create();
+
+		Mouse.create();
+		Mouse.setGrabbed(false);
     }
 
 	//*****************************************************************************************************************
@@ -139,7 +211,7 @@ public class ClientApplication
 
 	//*****************************************************************************************************************
     private Sphere mSphere;
-	private int numberOfStars = 100;
+	private int numberOfStars = 200;
 	private float starPositions[][]= new float[numberOfStars][3];
 	private float starColors[][]= new float[numberOfStars][3];
 
@@ -151,8 +223,8 @@ public class ClientApplication
         //mSphere.setTextureFlag(true);
 
 	  	for (i=0;i<numberOfStars;i++){
-			starPositions[i][0] = generator.nextFloat()*80f-40f; //x positions
-			starPositions[i][1] = generator.nextFloat()*50f-25f; //y positions
+			starPositions[i][0] = generator.nextFloat()*100f-50f; //x positions
+			starPositions[i][1] = generator.nextFloat()*100f-50f; //y positions
 			starPositions[i][2] = -generator.nextFloat()*100f+5; //z positions
 
 			starColors[i][0] = generator.nextFloat();
@@ -197,7 +269,7 @@ public class ClientApplication
           45.0f,
           (float) displayMode.getWidth() / (float) displayMode.getHeight(),
           0.1f,
-          150.0f);
+          500.0f);
 
         GL11.glMatrixMode(GL11.GL_MODELVIEW); // Select The Modelview Matrix
 
@@ -238,13 +310,13 @@ public class ClientApplication
 		
 		for (i=0;i<numberOfStars;i++){
             GL11.glLoadIdentity();                          // Reset The Current Modelview Matrix
-			GL11.glTranslatef(0f, 0f, -52.5f);	
+			GL11.glTranslatef(0f, 0f, -52.5f-sceneDistance);
 			GL11.glRotatef(sceneYAngle,0.0f,1.0f,0.0f);
 			GL11.glRotatef(sceneXAngle,1.0f,0.0f,0.0f);		
-			GL11.glTranslatef(0f, 0f, 52.5f);	
+			GL11.glTranslatef(0f, 0f, 52.5f);
             GL11.glTranslatef(starPositions[i][0], starPositions[i][1], starPositions[i][2]);
             GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);
-			//GL11.glColor3f(1f, 1f, 1f);
+
             mSphere.draw(0.5f, 20, 10);
 		}
 
