@@ -1,9 +1,9 @@
 package com.ospgames.goh.clientjava;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.glu.Disk;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.glu.Sphere;
@@ -11,6 +11,7 @@ import org.lwjgl.util.glu.Sphere;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.*;
 
 public class ClientApplication
 {
@@ -22,9 +23,10 @@ public class ClientApplication
     private final String windowTitle = GAME_TITLE;
     private boolean f1 = false;
 
-    private float rtri;                 // Angle For The Triangle ( NEW )
-    private float rquad;                // Angle For The Quad     ( NEW )
+    private float sceneYAngle = 0;             // scene rotation angle around the Y axis
     private DisplayMode displayMode;
+
+	//*****************************************************************************************************************
 
     public static void main(String args[]) {
         boolean fullscreen = false;
@@ -37,13 +39,15 @@ public class ClientApplication
         ClientApplication app = new ClientApplication();
         app.run(fullscreen);
     }
+
+	//*****************************************************************************************************************
     public void run(boolean fullscreen) {
         this.fullscreen = fullscreen;
         try {
             init();
             while (!done) {
                 mainloop();
-                renderScene();
+	            renderScene();
                 Display.update();
             }
             cleanup();
@@ -53,6 +57,8 @@ public class ClientApplication
             System.exit(0);
         }
     }
+
+	//*****************************************************************************************************************
     private void mainloop() {
         if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {       // Exit if Escape is pressed
             done = true;
@@ -69,6 +75,7 @@ public class ClientApplication
         }
     }
 
+	//*****************************************************************************************************************
     private void switchMode() {
         fullscreen = !fullscreen;
         try {
@@ -79,87 +86,13 @@ public class ClientApplication
         }
     }
 
-    private boolean render() {
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);          // Clear The Screen And The Depth Buffer
-
-        GL11.glLoadIdentity();                          // Reset The Current Modelview Matrix
-
-        GL11.glTranslatef(-1.5f,0.0f,-6.0f);                // Move Left 1.5 Units And Into The Screen 6.0
-        GL11.glRotatef(rtri,0.0f,1.0f,0.0f);                // Rotate The Triangle On The Y axis ( NEW )
-        GL11.glBegin(GL11.GL_TRIANGLES);                    // Drawing Using Triangles
-            GL11.glColor3f(1.0f,0.0f,0.0f);             // Red
-            GL11.glVertex3f( 0.0f, 1.0f, 0.0f);         // Top Of Triangle (Front)
-            GL11.glColor3f(0.0f,1.0f,0.0f);             // Green
-            GL11.glVertex3f(-1.0f,-1.0f, 1.0f);         // Left Of Triangle (Front)
-            GL11.glColor3f(0.0f,0.0f,1.0f);             // Blue
-            GL11.glVertex3f( 1.0f,-1.0f, 1.0f);         // Right Of Triangle (Front)
-            GL11.glColor3f(1.0f,0.0f,0.0f);             // Red
-            GL11.glVertex3f( 0.0f, 1.0f, 0.0f);         // Top Of Triangle (Right)
-            GL11.glColor3f(0.0f,0.0f,1.0f);             // Blue
-            GL11.glVertex3f( 1.0f,-1.0f, 1.0f);         // Left Of Triangle (Right)
-            GL11.glColor3f(0.0f,1.0f,0.0f);             // Green
-            GL11.glVertex3f( 1.0f,-1.0f, -1.0f);            // Right Of Triangle (Right)
-            GL11.glColor3f(1.0f,0.0f,0.0f);             // Red
-            GL11.glVertex3f( 0.0f, 1.0f, 0.0f);         // Top Of Triangle (Back)
-            GL11.glColor3f(0.0f,1.0f,0.0f);             // Green
-            GL11.glVertex3f( 1.0f,-1.0f, -1.0f);            // Left Of Triangle (Back)
-            GL11.glColor3f(0.0f,0.0f,1.0f);             // Blue
-            GL11.glVertex3f(-1.0f,-1.0f, -1.0f);            // Right Of Triangle (Back)
-            GL11.glColor3f(1.0f,0.0f,0.0f);             // Red
-            GL11.glVertex3f( 0.0f, 1.0f, 0.0f);         // Top Of Triangle (Left)
-            GL11.glColor3f(0.0f,0.0f,1.0f);             // Blue
-            GL11.glVertex3f(-1.0f,-1.0f,-1.0f);         // Left Of Triangle (Left)
-            GL11.glColor3f(0.0f,1.0f,0.0f);             // Green
-            GL11.glVertex3f(-1.0f,-1.0f, 1.0f);         // Right Of Triangle (Left)
-        GL11.glEnd();                                       // Finished Drawing The Triangle
-
-        GL11.glLoadIdentity();                          // Reset The Current Modelview Matrix
-        GL11.glTranslatef(1.5f,0.0f,-7.0f);             // Move Right 1.5 Units And Into The Screen 6.0
-        GL11.glRotatef(rquad,1.0f,1.0f,1.0f);               // Rotate The Quad On The X axis ( NEW )
-        GL11.glColor3f(0.5f,0.5f,1.0f);                 // Set The Color To Blue One Time Only
-        GL11.glBegin(GL11.GL_QUADS);                        // Draw A Quad
-            GL11.glColor3f(0.0f,1.0f,0.0f);             // Set The Color To Green
-            GL11.glVertex3f( 1.0f, 1.0f,-1.0f);         // Top Right Of The Quad (Top)
-            GL11.glVertex3f(-1.0f, 1.0f,-1.0f);         // Top Left Of The Quad (Top)
-            GL11.glVertex3f(-1.0f, 1.0f, 1.0f);         // Bottom Left Of The Quad (Top)
-            GL11.glVertex3f( 1.0f, 1.0f, 1.0f);         // Bottom Right Of The Quad (Top)
-            GL11.glColor3f(1.0f,0.5f,0.0f);             // Set The Color To Orange
-            GL11.glVertex3f( 1.0f,-1.0f, 1.0f);         // Top Right Of The Quad (Bottom)
-            GL11.glVertex3f(-1.0f,-1.0f, 1.0f);         // Top Left Of The Quad (Bottom)
-            GL11.glVertex3f(-1.0f,-1.0f,-1.0f);         // Bottom Left Of The Quad (Bottom)
-            GL11.glVertex3f( 1.0f,-1.0f,-1.0f);         // Bottom Right Of The Quad (Bottom)
-            GL11.glColor3f(1.0f,0.0f,0.0f);             // Set The Color To Red
-            GL11.glVertex3f( 1.0f, 1.0f, 1.0f);         // Top Right Of The Quad (Front)
-            GL11.glVertex3f(-1.0f, 1.0f, 1.0f);         // Top Left Of The Quad (Front)
-            GL11.glVertex3f(-1.0f,-1.0f, 1.0f);         // Bottom Left Of The Quad (Front)
-            GL11.glVertex3f( 1.0f,-1.0f, 1.0f);         // Bottom Right Of The Quad (Front)
-            GL11.glColor3f(1.0f,1.0f,0.0f);             // Set The Color To Yellow
-            GL11.glVertex3f( 1.0f,-1.0f,-1.0f);         // Bottom Left Of The Quad (Back)
-            GL11.glVertex3f(-1.0f,-1.0f,-1.0f);         // Bottom Right Of The Quad (Back)
-            GL11.glVertex3f(-1.0f, 1.0f,-1.0f);         // Top Right Of The Quad (Back)
-            GL11.glVertex3f( 1.0f, 1.0f,-1.0f);         // Top Left Of The Quad (Back)
-            GL11.glColor3f(0.0f,0.0f,1.0f);             // Set The Color To Blue
-            GL11.glVertex3f(-1.0f, 1.0f, 1.0f);         // Top Right Of The Quad (Left)
-            GL11.glVertex3f(-1.0f, 1.0f,-1.0f);         // Top Left Of The Quad (Left)
-            GL11.glVertex3f(-1.0f,-1.0f,-1.0f);         // Bottom Left Of The Quad (Left)
-            GL11.glVertex3f(-1.0f,-1.0f, 1.0f);         // Bottom Right Of The Quad (Left)
-            GL11.glColor3f(1.0f,0.0f,1.0f);             // Set The Color To Violet
-            GL11.glVertex3f( 1.0f, 1.0f,-1.0f);         // Top Right Of The Quad (Right)
-            GL11.glVertex3f( 1.0f, 1.0f, 1.0f);         // Top Left Of The Quad (Right)
-            GL11.glVertex3f( 1.0f,-1.0f, 1.0f);         // Bottom Left Of The Quad (Right)
-            GL11.glVertex3f( 1.0f,-1.0f,-1.0f);         // Bottom Right Of The Quad (Right)
-        GL11.glEnd();                                       // Done Drawing The Quad
-
-        rtri+=0.2f;                                     // Increase The Rotation Variable For The Triangle ( NEW )
-        rquad-=0.15f;                                   // Decrease The Rotation Variable For The Quad     ( NEW )
-        return true;
-    }
+	//*****************************************************************************************************************
     private void createWindow() throws Exception {
         Display.setFullscreen(fullscreen);
         DisplayMode d[] = Display.getAvailableDisplayModes();
         for (int i = 0; i < d.length; i++) {
-            if (d[i].getWidth() == 640
-                && d[i].getHeight() == 480
+            if (d[i].getWidth() == 1680
+                && d[i].getHeight() == 1050
                 && d[i].getBitsPerPixel() == 32) {
                 displayMode = d[i];
                 break;
@@ -169,6 +102,8 @@ public class ClientApplication
         Display.setTitle(windowTitle);
         Display.create();
     }
+
+	//*****************************************************************************************************************
     private void init() throws Exception {
         createWindow();
 
@@ -177,23 +112,55 @@ public class ClientApplication
         initWorld();
     }
 
-    private Sphere mSphere = new Sphere();
-
+	//*****************************************************************************************************************
+    private Sphere mSphere;
+	private int numberOfStars = 100;
+	private float starPositions[][]= new float[numberOfStars][3];
+	private float starColors[][]= new float[numberOfStars][3];
 
     private void initWorld() {
-        mSphere = new Sphere();
-        mSphere.setNormals(GL11.GL_SMOOTH);
+	    int i;
+	    Random generator = new Random(System.currentTimeMillis());
+	    mSphere = new Sphere();
+	    mSphere.setNormals(GL11.GL_SMOOTH);
         //mSphere.setTextureFlag(true);
+
+	  	for (i=0;i<numberOfStars;i++){
+			starPositions[i][0] = generator.nextFloat()*80f-40f; //x positions
+			starPositions[i][1] = generator.nextFloat()*50f-25f; //y positions
+			starPositions[i][2] = -generator.nextFloat()*100f+5; //z positions
+
+			starColors[i][0] = generator.nextFloat();
+			starColors[i][1] = generator.nextFloat();
+			starColors[i][2] = generator.nextFloat();
+		}
     }
 
+	//*****************************************************************************************************************
     private void initGL() {
+
+        float fogColor[] = {0.5f, 0.5f, 0.5f, 1.0f};        // Fog Color
+
+		ByteBuffer temp = ByteBuffer.allocateDirect(16);
+
         GL11.glEnable(GL11.GL_TEXTURE_2D); // Enable Texture Mapping
         GL11.glShadeModel(GL11.GL_SMOOTH); // Enable Smooth Shading
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Black Background
         GL11.glClearDepth(1.0); // Depth Buffer Setup
         GL11.glEnable(GL11.GL_DEPTH_TEST); // Enables Depth Testing
-        GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Testing To Do
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		// GL11.glEnable(GL11.);
+		GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Testing To Do
 
+		//fog
+        GL11.glFogi(GL11.GL_FOG_MODE, GL11.GL_LINEAR);                  // Fog Mode
+        temp.asFloatBuffer().put(fogColor).flip();
+        GL11.glFog(GL11.GL_FOG_COLOR, temp.asFloatBuffer());                // Set Fog Color
+        GL11.glFogf(GL11.GL_FOG_DENSITY, 0.5f);                            // How Dense Will The Fog Be
+        GL11.glHint(GL11.GL_FOG_HINT, GL11.GL_DONT_CARE);                   // Fog Hint Value
+        GL11.glFogf(GL11.GL_FOG_START, 1.0f);                               // Fog Start Depth
+        GL11.glFogf(GL11.GL_FOG_END, 125f);                                 // Fog End Depth
+        GL11.glEnable(GL11.GL_FOG);                                         // Enables GL_FOG
 
         initLights();
 
@@ -205,21 +172,20 @@ public class ClientApplication
           45.0f,
           (float) displayMode.getWidth() / (float) displayMode.getHeight(),
           0.1f,
-          100.0f);
+          150.0f);
+
         GL11.glMatrixMode(GL11.GL_MODELVIEW); // Select The Modelview Matrix
 
         // Really Nice Perspective Calculations
         GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
     }
-    private static void cleanup() {
-        Display.destroy();
-    }
 
+	//*****************************************************************************************************************
     private float mZ = 0;
 
-    public static final float[] LIGHT_AMBIENT = new float[] { 0.7f, 0.7f, 0.7f, 1.0f };
+    public static final float[] LIGHT_AMBIENT = new float[] { 0.0f, 0.0f, 0.0f, 1.0f };
     public static final float[] LIGHT_DIF = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
-    public static final float[] LIGHT_POS = new float[] { 4.0f, 4.0f, 6.0f, 1.0f };
+    public static final float[] LIGHT_POS = new float[] { 10.0f, 10.0f, 6.0f, 1.0f };
     ByteBuffer lightBuffer;
 
     private void initLights() {
@@ -229,21 +195,41 @@ public class ClientApplication
         GL11.glLight(GL11.GL_LIGHT0, GL11.GL_DIFFUSE, (FloatBuffer)lightBuffer.asFloatBuffer().put(LIGHT_DIF).flip());              // Setup The Diffuse Light
         GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, (FloatBuffer)lightBuffer.asFloatBuffer().put(LIGHT_POS).flip());         // Position The Light
 
-        GL11.glEnable(GL11.GL_LIGHT0);                                // Enable Light 0
+        GL11.glEnable(GL11.GL_LIGHT0);         // Enable Light 0
         GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_COLOR_MATERIAL);// Enable Material Lighting
+        GL11.glEnable(GL11.GL_COLOR_MATERIAL); // Enable Material Lighting
     }
 
+	//*****************************************************************************************************************
     private void renderScene() {
+		int i;
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);          // Clear The Screen And The Depth Buffer
 
-        GL11.glLoadIdentity();                          // Reset The Current Modelview Matrix
+		GL11.glLoadIdentity();                          // Reset The Current Modelview Matrix
+        // GL11.glTranslatef(0f,0f,-5.5f);
+        // GL11.glColor3f(1f, 0.5f,0f);
+        //mSphere.draw(1.5f, 64, 32);
+		
+		for (i=0;i<numberOfStars;i++){
+            GL11.glLoadIdentity();                          // Reset The Current Modelview Matrix
+			GL11.glTranslatef(0f, 0f, -52.5f);	
+			GL11.glRotatef(sceneYAngle,0.0f,1.0f,0.0f);
+			GL11.glTranslatef(0f, 0f, 52.5f);	
+            GL11.glTranslatef(starPositions[i][0], starPositions[i][1], starPositions[i][2]);
+            GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);
+			//GL11.glColor3f(1f, 1f, 1f);
+            mSphere.draw(0.5f, 20, 10);
+		}
 
-        GL11.glTranslatef(0,0,-5.5f );
-        GL11.glColor3f(0.7f, 0.7f, 0.0f);
-        mSphere.draw(0.35f, 32, 16);
-
+		sceneYAngle += 0.1;
+		if (sceneYAngle > 360) sceneYAngle = 0; 
+		// System.out.println("Scene Y angle: "+sceneYAngle);
     }
 
+	//*****************************************************************************************************************
+	private static void cleanup() {
+        Display.destroy();
+    }
 }
+
