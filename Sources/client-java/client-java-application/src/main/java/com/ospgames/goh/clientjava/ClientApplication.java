@@ -139,21 +139,21 @@ public class ClientApplication
 		// *** rotate starfield if mouse is dragged
 		Mouse.next();
 
-		mouseDeltaX = Mouse.getEventDX();
-		mouseDeltaY = Mouse.getEventDY();
+		mouseDeltaX = Mouse.getDX();
+		mouseDeltaY = Mouse.getDY();
+
+		// System.out.println("Delta X:"+mouseDeltaX);
+		// System.out.println("Delta Y:"+mouseDeltaY);
+		// System.out.println();
 
 		if (Mouse.isButtonDown(0)) {
 			sceneXAngle -= (float)mouseDeltaY/10f;
-			if (sceneXAngle > 360f) sceneXAngle = sceneXAngle % 360;
-			if (sceneXAngle < 360f) sceneXAngle = sceneXAngle % 360;
+			if (sceneXAngle > 360f) sceneXAngle = sceneXAngle - 360;
+			if (sceneXAngle < 0f) sceneXAngle = sceneXAngle + 360;
 
 			sceneYAngle += (float)mouseDeltaX/10f;
-			if (sceneYAngle > 360f) sceneYAngle = sceneYAngle % 360;
-			if (sceneYAngle < 360f) sceneYAngle = sceneYAngle % 360;
-
-			// System.out.println("Delta X:"+mouseDeltaX);
-			// System.out.println("Delta Y:"+mouseDeltaY);
-			// System.out.println();
+			if (sceneYAngle > 360f) sceneYAngle = sceneYAngle - 360;
+			if (sceneYAngle < 0f) sceneYAngle = sceneYAngle + 360;
 		}
 
 		mouseWheelDelta = Mouse.getDWheel();
@@ -211,9 +211,10 @@ public class ClientApplication
 
 	//*****************************************************************************************************************
     private Sphere mSphere;
-	private int numberOfStars = 200;
+	private int numberOfStars = 100;
 	private float starPositions[][]= new float[numberOfStars][3];
 	private float starColors[][]= new float[numberOfStars][3];
+	private int star;
 
     private void initWorld() {
 	    int i;
@@ -231,6 +232,13 @@ public class ClientApplication
 			starColors[i][1] = generator.nextFloat();
 			starColors[i][2] = generator.nextFloat();
 		}
+
+	    // create display list for the star sphere
+	    star = GL11.glGenLists(2);
+	    GL11.glNewList(star,GL11.GL_COMPILE);
+	    mSphere.draw(0.5f, 20, 10);
+	    GL11.glEndList();
+
     }
 
 	//*****************************************************************************************************************
@@ -317,7 +325,7 @@ public class ClientApplication
             GL11.glTranslatef(starPositions[i][0], starPositions[i][1], starPositions[i][2]);
             GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);
 
-            mSphere.draw(0.5f, 20, 10);
+            GL11.glCallList(star);
 		}
 
 		// System.out.println("Scene Y angle: "+sceneYAngle);
