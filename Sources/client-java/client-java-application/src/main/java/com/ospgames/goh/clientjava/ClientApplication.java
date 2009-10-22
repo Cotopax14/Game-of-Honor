@@ -225,10 +225,10 @@ public class ClientApplication
 
 	//*****************************************************************************************************************
     private Sphere mSphere;
-	private int numberOfStars = 100;
+	private int numberOfStars = 1000;
 	private float starPositions[][]= new float[numberOfStars][3];
 	private float starColors[][]= new float[numberOfStars][3];
-	private int starSelected = 0;
+	private int starsSelected[] = new int[numberOfStars];
 
 	private int star;
 
@@ -374,13 +374,6 @@ System.out.println("Selection");
 		hits = GL11.glRenderMode(GL11.GL_RENDER);
 
 System.out.println("Hits: "+hits);
-System.out.println("Mouse X: "+mouse_x);
-System.out.println("Mouse Y: "+mouse_y);
-System.out.println("Viewport X: "+viewport[0]);
-System.out.println("Viewport Y: "+viewport[1]);
-System.out.println("Viewport Width: "+viewport[2]);
-System.out.println("Viewport Height: "+viewport[3]);
-System.out.println("*********************************");
 
 		selBuffer.get(buffer);
 		// Objects Were Drawn Where The Mouse Was
@@ -397,7 +390,8 @@ System.out.println("*********************************");
 				}
 			}
 
-			starSelected = choose;                            // Mark The Object As Being Hit
+			System.out.println("Chosen Star: "+choose);
+			starsSelected[choose]=(starsSelected[choose]==0)?1:0;                            // Toggle The Object As Being Hit by player 1
 		}
 	}
 
@@ -420,50 +414,18 @@ System.out.println("*********************************");
             GL11.glTranslatef(starPositions[i][0], starPositions[i][1], starPositions[i][2]);
 
 			// choose color according to select state
-			if (starSelected == i) {
-				GL11.glColor3f(1f, 1f, 1f);
-			}
-			else
-			{
-				GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);
+
+
+			switch (starsSelected[i]) {
+				case 1: GL11.glColor3f(1f, 1f, 1f); break;
+				case 2: GL11.glColor3f(0.5f, 1f, 0.5f); break;
+				default: GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);
 			}
 
 			GL11.glCallList(star);
 		}
 
 		// System.out.println("Scene Y angle: "+sceneYAngle);
-    }
-
-	//*****************************************************************************************************************
-    private void renderStarsForSelection() {
-		int i;
-
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);          // Clear The Screen And The Depth Buffer
-
-		GL11.glMatrixMode(GL11.GL_MODELVIEW);
-
-		for (i=0; i<numberOfStars; i++){
-			GL11.glLoadName(i);                                     // Assign Object A Name (ID)
-
-			GL11.glLoadIdentity();                                  // Reset The Current Modelview Matrix
-
-			GL11.glTranslatef(0f, 0f, -52.5f-sceneDistance);
-			GL11.glRotatef(sceneYAngle,0.0f,1.0f,0.0f);
-			GL11.glRotatef(sceneXAngle,1.0f,0.0f,0.0f);
-			GL11.glTranslatef(0f, 0f, 52.5f);
-            GL11.glTranslatef(starPositions[i][0], starPositions[i][1], starPositions[i][2]);
-
-			// choose color according to select state
-			if (starSelected == i) {
-				GL11.glColor3f(1f, 1f, 1f);
-			}
-			else
-			{
-				GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);
-			}
-
-			GL11.glCallList(star);
-		}
     }
 
 	//*****************************************************************************************************************
