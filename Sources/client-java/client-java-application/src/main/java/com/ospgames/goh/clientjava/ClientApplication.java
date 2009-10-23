@@ -419,7 +419,8 @@ System.out.println("Hits: "+hits);
 			switch (starsSelected[i]) {
 				case 1: GL11.glColor3f(1f, 1f, 1f); break;
 				case 2: GL11.glColor3f(0.5f, 1f, 0.5f); break;
-				default: GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);
+				default: /*GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);*/
+						 GL11.glColor3f(0.5f, 0.25f, 0f);
 			}
 
 			GL11.glCallList(star);
