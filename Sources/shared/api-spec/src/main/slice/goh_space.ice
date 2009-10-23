@@ -36,13 +36,25 @@ module ospgames {
 
       class StarType {
             string name;                /** unique name of this type  */
-            long   resources;           /** resources to aquire per unit of time */
+            int   resources;           /** resources to aquire per unit of time */
             long   hyperlimitRadius;    /** radius of the hyperlimit in m */
             long   outerHabitableRadius;/** outer radius of the habitable zone in m */
       };
 
+      /** Forward definition */
+      class Star;
+
+      /** Direct Connection between two stars */
+      class Wormhole {
+            int starA;    /** The id of the star that is connected */
+            int starB;    /** The id of the star that is connected */
+      };
+
+      ["java:type:java.util.ArrayList<com.ospgames.goh.space.Wormhole>:java.util.List<com.ospgames.goh.space.Wormhole>"]
+      sequence<Wormhole> WormholeSeq;
+
       class Star {
-        long     id;                /** unique id of the star     */
+        int     id;                 /** unique id of the star     */
         string   name;              /** unique name of the star   */
         generic::Vector3D position; /** fix position of this star */
         StarType type;              /** type of this star         */
@@ -53,6 +65,11 @@ module ospgames {
 	  ["java:type:java.util.ArrayList<com.ospgames.goh.space.Star>:java.util.List<com.ospgames.goh.space.Star>"]
 	  sequence<Star>   StarSeq;
 
+
+      class StarCluster {
+        StarSeq stars;              /** The stars of the world.         */
+        WormholeSeq wormholes;      /** The wormholes of the cluster    */
+      };
 
       /** TO BE DISCUSSED: might be structure of the specific domain
           e.g. owner and building colony management */

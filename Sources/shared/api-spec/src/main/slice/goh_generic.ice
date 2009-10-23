@@ -28,19 +28,19 @@ module ospgames {
 
       /** Generic type for date and time */
       struct DateTime {
-        long year;     /**< The year with century */
-        long month;    /**< The month (1..12) */
-        long day;      /**< The day (1..31) */
-        long hour;     /**< Hour in 24h format (0..23) */
-        long minute;   /**< The minute */
-        long second;   /**< The second */
-        long milliSeconds; /**< The millisecond */
+        int year;     /**< The year with century */
+        byte month;    /**< The month (1..12) */
+        byte day;      /**< The day (1..31) */
+        byte hour;     /**< Hour in 24h format (0..23) */
+        byte minute;   /**< The minute */
+        byte second;   /**< The second */
+        byte milliSeconds; /**< The millisecond */
       };
 
       struct Vector3D {
-        long x;         /** X-part */
-        long y;         /** Y-part */
-        long z;         /** Z-part */
+        float x;         /** X-part */
+        float y;         /** Y-part */
+        float z;         /** Z-part */
       };
 
 
