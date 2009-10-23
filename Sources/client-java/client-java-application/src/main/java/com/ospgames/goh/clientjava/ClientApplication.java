@@ -72,7 +72,8 @@ public class ClientApplication
 	// two variables needed to make the key's effect a smooth acceleration and deceleration
 	private static float keyboardAcceleration = 0.01f;
 	private boolean isRotateKeyPressed = false;
-	private boolean isMouseKeyPressed = false;
+	private boolean isLeftMouseKeyPressed = false;
+	private boolean isRightMouseKeyPressed = false;
 
 	private void mainloop() {
 
@@ -154,7 +155,7 @@ public class ClientApplication
 		// System.out.println("Delta Y:"+mouseDeltaY);
 		// System.out.println();
 
-		if (Mouse.isButtonDown(0)) {
+		if (Mouse.isButtonDown(1)) {
 			sceneXAngle -= (float)mouseDeltaY/10f;
 			if (sceneXAngle > 90f) sceneXAngle = 90;
 			if (sceneXAngle < -90f) sceneXAngle = -90;
@@ -162,15 +163,17 @@ public class ClientApplication
 			sceneYAngle += (float)mouseDeltaX/10f;
 			if (sceneYAngle > 360f) sceneYAngle = sceneYAngle - 360;
 			if (sceneYAngle < 0f) sceneYAngle = sceneYAngle + 360;
+		}
 
-			if (!isMouseKeyPressed){
+		if (Mouse.isButtonDown(0)) {
+			if (!isLeftMouseKeyPressed){
 				selection(Mouse.getX(), Mouse.getY());
-				isMouseKeyPressed=true;
+				isLeftMouseKeyPressed=true;
 			}
 		}
 		else
 		{
-			isMouseKeyPressed=false;
+			isLeftMouseKeyPressed=false;
 		}
 
 		mouseWheelDelta = Mouse.getDWheel();
@@ -419,8 +422,8 @@ System.out.println("Hits: "+hits);
 			switch (starsSelected[i]) {
 				case 1: GL11.glColor3f(1f, 1f, 1f); break;
 				case 2: GL11.glColor3f(0.5f, 1f, 0.5f); break;
-				default: /*GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);*/
-						 GL11.glColor3f(0.5f, 0.25f, 0f);
+				default: GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);
+						 /* GL11.glColor3f(0.5f, 0.25f, 0f); */
 			}
 
 			GL11.glCallList(star);
