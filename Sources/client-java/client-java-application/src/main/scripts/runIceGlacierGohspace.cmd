@@ -11,7 +11,7 @@ for %%G in (./libs/*.jar) do (call :s_do_set %%G)
 
 echo APP_CLASSPATH: %APP_CLASSPATH%
 
-"%JAVA_HOME%/bin/java" -classpath config;%APP_CLASSPATH% %CLIENT_OPTIONS% -Djava.library.path=natives -jar libs/${project.artifactId}-${project.version}.jar --Ice.Config=config/ice-config.properties
+"%JAVA_HOME%/bin/java" -classpath config;%APP_CLASSPATH% %CLIENT_OPTIONS% -Djava.library.path=natives com.ospgames.goh.clientjava.IceClient --Ice.Config=config/ice-config-glacier-gohspace.properties
 goto :end
 
 :s_do_set

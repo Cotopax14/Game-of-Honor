@@ -27,7 +27,8 @@ public class GohServer extends Ice.Application {
         // Create an object adapter (stored in the _adapter
         // static members)
         //
-        Ice.ObjectAdapter adapter = communicator().createObjectAdapterWithEndpoints("ObjectAdapter","default -p 10000");
+        // Ice.ObjectAdapter adapter = communicator().createObjectAdapterWithEndpoints("ObjectAdapter","default -p 10000");
+        Ice.ObjectAdapter adapter = communicator().createObjectAdapter("ObjectAdapter");
         NamingServiceImpl namingService = new NamingServiceImpl();
         namingService.activate(adapter);
 

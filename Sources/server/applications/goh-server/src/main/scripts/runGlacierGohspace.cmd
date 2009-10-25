@@ -1,0 +1,1 @@
+glacier2router --Ice.Config=config/glacier-gohspace-config.properties
