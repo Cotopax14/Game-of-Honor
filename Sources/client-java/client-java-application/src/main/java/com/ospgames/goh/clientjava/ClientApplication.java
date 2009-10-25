@@ -1,20 +1,21 @@
 package com.ospgames.goh.clientjava;
 
+import com.ospgames.goh.generic.Vector3D;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.util.glu.Disk;
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.glu.Sphere;
-import org.lwjgl.input.Mouse;
 
+import javax.vecmath.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.*;
+import java.util.Random;
+
 
 public class ClientApplication
 {
@@ -55,7 +56,7 @@ public class ClientApplication
             init();
             while (!done) {
                 mainloop();
-	            renderStars();
+	            renderScene();
 	            // DrawEntities();
                 Display.update();
             }
@@ -220,23 +221,22 @@ public class ClientApplication
 	//*****************************************************************************************************************
     private void init() throws Exception {
         createWindow();
-
         initGL();
-
         initWorld();
     }
 
 	//*****************************************************************************************************************
-    private Sphere mSphere;
-	private int numberOfStars = 1000;
+	private int numberOfStars = 100;
 	private float starPositions[][]= new float[numberOfStars][3];
 	private float starColors[][]= new float[numberOfStars][3];
 	private int starsSelected[] = new int[numberOfStars];
 
-	private int star;
+	private int starSphere;
+	private int billboard;
 
     private void initWorld() {
 	    int i;
+	    Sphere mSphere;
 	    Random generator = new Random(System.currentTimeMillis());
 
 		//generate spheres as stars
@@ -256,11 +256,25 @@ public class ClientApplication
 		}
 
 	    // create display list for the star sphere
-	    star = GL11.glGenLists(2);
-	    GL11.glNewList(star,GL11.GL_COMPILE);
+	    starSphere = GL11.glGenLists(1);
+	    GL11.glNewList(starSphere,GL11.GL_COMPILE);
 	    mSphere.draw(0.5f, 20, 10);
 	    GL11.glEndList();
 
+	    // create display list for the name and status billboard
+	    billboard = GL11.glGenLists(1);
+	    GL11.glNewList(billboard,GL11.GL_COMPILE);
+	        GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_LINE);
+	        GL11.glLineWidth(2f);
+	        GL11.glTranslatef(1.0f, 0.0f, 0.0f);
+			GL11.glBegin(GL11.GL_LINE_LOOP);
+	            GL11.glVertex3f(2.0f, 0.5f,  0.0f);
+	            GL11.glVertex3f(0.0f, 0.5f,  0.0f);
+				GL11.glVertex3f(0.0f, -0.5f, 0.0f);
+				GL11.glVertex3f( 2.0f, -0.5f, 0.0f);
+			GL11.glEnd();
+	    GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);	        
+	    GL11.glEndList();
     }
 
 	//*****************************************************************************************************************
@@ -276,7 +290,7 @@ public class ClientApplication
         GL11.glClearDepth(1.0); // Depth Buffer Setup
         GL11.glEnable(GL11.GL_DEPTH_TEST); // Enables Depth Testing
 		GL11.glEnable(GL11.GL_CULL_FACE);
-		// GL11.glEnable(GL11.);
+		GL11.glEnable(GL11.GL_LINE_SMOOTH);
 		GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Testing To Do
 
 		//fog
@@ -344,7 +358,7 @@ public class ClientApplication
 		// The number of "hits" (objects within the pick area)
 		int hits;
 
-System.out.println("Selection");
+// System.out.println("Selection");
 
 		// Get the viewport info
 		GL11.glGetInteger(GL11.GL_VIEWPORT, vpBuffer);
@@ -368,7 +382,7 @@ System.out.println("Selection");
 		GLU.gluPickMatrix( (float) mouse_x, (float) mouse_y, 5.0f, 5.0f, IntBuffer.wrap(viewport));
 
 		GLU.gluPerspective(45.0f, (float) (viewport[2] - viewport[0]) / (float) (viewport[3] - viewport[1]), 0.1f, 500.0f);
-		renderStars();
+		renderScene();
 
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
 		GL11.glPopMatrix();
@@ -376,7 +390,7 @@ System.out.println("Selection");
 		// Exit selection mode and return to render mode, returns number selected
 		hits = GL11.glRenderMode(GL11.GL_RENDER);
 
-System.out.println("Hits: "+hits);
+// System.out.println("Hits: "+hits);
 
 		selBuffer.get(buffer);
 		// Objects Were Drawn Where The Mouse Was
@@ -393,13 +407,13 @@ System.out.println("Hits: "+hits);
 				}
 			}
 
-			System.out.println("Chosen Star: "+choose);
+//			System.out.println("Chosen Star: "+choose);
 			starsSelected[choose]=(starsSelected[choose]==0)?1:0;                            // Toggle The Object As Being Hit by player 1
 		}
 	}
 
 	//*****************************************************************************************************************
-    private void renderStars() {
+    private void renderScene() {
 		int i;
 
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);          // Clear The Screen And The Depth Buffer
@@ -407,30 +421,136 @@ System.out.println("Hits: "+hits);
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
 
 		for (i=0; i<numberOfStars; i++){
-			GL11.glLoadName(i);                                     // Assign Object A Name (ID)           
-
-			GL11.glLoadIdentity();                                  // Reset The Current Modelview Matrix
-			GL11.glTranslatef(0f, 0f, -52.5f-sceneDistance);
-			GL11.glRotatef(sceneYAngle,0.0f,1.0f,0.0f);
-			GL11.glRotatef(sceneXAngle,1.0f,0.0f,0.0f);
-			GL11.glTranslatef(0f, 0f, 52.5f);
-            GL11.glTranslatef(starPositions[i][0], starPositions[i][1], starPositions[i][2]);
-
-			// choose color according to select state
-
-
-			switch (starsSelected[i]) {
-				case 1: GL11.glColor3f(1f, 1f, 1f); break;
-				case 2: GL11.glColor3f(0.5f, 1f, 0.5f); break;
-				default: GL11.glColor3f(starColors[i][0], starColors[i][1], starColors[i][2]);
-						 /* GL11.glColor3f(0.5f, 0.25f, 0f); */
-			}
-
-			GL11.glCallList(star);
+			drawStar(i);
 		}
 
 		// System.out.println("Scene Y angle: "+sceneYAngle);
     }
+
+	//*****************************************************************************************************************
+	private void drawStar(int star){
+		GL11.glLoadName(star);                                     // Assign Object A Name (ID)
+
+		GL11.glLoadIdentity();                                  // Reset The Current Modelview Matrix
+		GL11.glTranslatef(0f, 0f, -52.5f-sceneDistance);
+		GL11.glRotatef(sceneYAngle,0.0f,1.0f,0.0f);
+		GL11.glRotatef(sceneXAngle,1.0f,0.0f,0.0f);
+		GL11.glTranslatef(0f, 0f, 52.5f);
+        GL11.glTranslatef(starPositions[star][0], starPositions[star][1], starPositions[star][2]);
+
+		// choose color according to select state
+		switch (starsSelected[star]) {
+			case 1: {
+				GL11.glColor3f(starColors[star][0], starColors[star][1], starColors[star][2]);
+				GL11.glPushMatrix();
+				GL11.glCallList(starSphere);
+				GL11.glPopMatrix();
+
+				drawStarNameAndStatus(star);				
+				break;
+			}
+			case 2: {
+				GL11.glColor3f(0.5f, 1f, 0.5f);
+				GL11.glCallList(starSphere);
+				break;
+			}
+			default: {
+				GL11.glColor3f(starColors[star][0], starColors[star][1], starColors[star][2]);
+				GL11.glCallList(starSphere);
+			}
+		}
+
+	}
+
+	//*****************************************************************************************************************
+	private void drawStarNameAndStatus(int star){
+		GL11.glPushMatrix();
+
+		GL11.glRotatef(sceneXAngle, -1, 0, 0); // undo perspective X rotation
+        GL11.glRotatef(sceneYAngle, 0, -1, 0); // undo perspective Y rotation
+        // GL11.glRotatef (rotate_z, 0, 0, -1); // there currently is no z axis rotation
+
+		GL11.glDisable(GL11.GL_LIGHTING); //switch off lighting so the billboard always appears lighted from the front
+		GL11.glColor3f(1f, 1f, 1f);
+
+		GL11.glCallList(billboard);
+
+		GL11.glEnable(GL11.GL_LIGHTING);   //re-enable lighting
+
+		GL11.glPopMatrix();
+	}
+
+	//*****************************************************************************************************************
+	static void billboardSphericalBegin(
+				float camX, float camY, float camZ,
+				float objPosX, float objPosY, float objPosZ) {
+
+		// This is the original lookAt vector for the object
+		// in world coordinates
+		javax.vecmath.Vector3f lookAt = new javax.vecmath.Vector3f(0, 0, 1);
+
+		// objToCamProj is the vector in world coordinates from the
+		// local origin to the camera projected in the XZ plane
+		javax.vecmath.Vector3f objToCamProj = new javax.vecmath.Vector3f(camX-objPosX, 0, camZ-objPosZ);
+
+		// objToCam is the vector in world coordinates from
+		// the local origin to the camera
+		javax.vecmath.Vector3f objToCam = new javax.vecmath.Vector3f(camX-objPosX, camY-objPosY, camZ-objPosZ);
+
+		javax.vecmath.Vector3f upAux = new Vector3f();
+		float modelview[] = new float[16];
+		float angleCosine;
+
+		GL11.glPushMatrix();
+
+	// normalize both vectors to get the cosine directly afterwards
+		objToCamProj.normalize();
+
+	// easy fix to determine wether the angle is negative or positive
+	// for positive angles upAux will be a vector pointing in the
+	// positive y direction, otherwise upAux will point downwards
+	// effectively reversing the rotation.
+
+		upAux.cross(lookAt,objToCamProj);
+
+	// compute the angle
+		angleCosine = lookAt.dot(objToCamProj);
+
+	// perform the rotation. The if statement is used for stability reasons
+	// if the lookAt and objToCamProj vectors are too close together then
+	// |angleCosine| could be bigger than 1 due to lack of precision
+	   if ((angleCosine < 0.99990) && (angleCosine > -0.9999))
+		  GL11.glRotatef((float)(Math.acos(angleCosine)*180/3.14), upAux.x, upAux.y, upAux.z);
+
+	// so far it is just like the cylindrical billboard. The code for the
+	// second rotation comes now
+	// The second part tilts the object so that it faces the camera
+
+	// Normalize to get the cosine afterwards
+		objToCam.normalize();
+
+	// Compute the angle between objToCamProj and objToCam,
+	//i.e. compute the required angle for the lookup vector
+
+		angleCosine = objToCamProj.dot(objToCam);
+
+	// Tilt the object. The test is done to prevent instability
+	// when objToCam and objToCamProj have a very small
+	// angle between them
+
+		if ((angleCosine < 0.99990) && (angleCosine > -0.9999))
+			if (objToCam.y < 0)
+				GL11.glRotatef((float)(Math.acos(angleCosine)*180/3.14),1,0,0);
+			else
+				GL11.glRotatef((float)(Math.acos(angleCosine)*180/3.14),-1,0,0);
+	}
+
+	//*****************************************************************************************************************
+	static void billboardEnd() {
+		// restore the previously 
+		// stored modelview matrix
+		GL11.glPopMatrix();
+	}
 
 	//*****************************************************************************************************************
 	private static void cleanup() {

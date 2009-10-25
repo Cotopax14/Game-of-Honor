@@ -21,8 +21,7 @@ public class IceClient extends Ice.Application {
 
     class ShutdownHook extends Thread
     {
-        public void
-        run()
+        public void run()
         {
             try
             {
