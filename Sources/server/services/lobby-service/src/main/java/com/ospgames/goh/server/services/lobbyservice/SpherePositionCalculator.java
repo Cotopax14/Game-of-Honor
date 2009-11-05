@@ -61,7 +61,7 @@ public class SpherePositionCalculator {
 
                 if (isInRadius( x, y, z) && hasNoCollision( x, y, z, positions)) {
 
-                    positions.addLast( new Position(x, y, z));
+                    positions.addLast( new Position((float)x, (float)y, (float)z));
                 }
 
                 // Give up if there is not enough space
@@ -123,7 +123,7 @@ public class SpherePositionCalculator {
     }
 
     protected boolean isConnected(List<Position> positions, double maxDist) {
-        // jede position gehört zu einem cluster von positionen die
+        // jede position gehÃ¶rt zu einem cluster von positionen die
         int[] clusters = new int[positions.size()];
         int clusterId = 1;
 

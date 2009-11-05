@@ -35,10 +35,10 @@ module ospgames {
       };
 
       class StarType {
-            string name;                /** unique name of this type  */
-            int   resources;           /** resources to aquire per unit of time */
-            long   hyperlimitRadius;    /** radius of the hyperlimit in m */
-            long   outerHabitableRadius;/** outer radius of the habitable zone in m */
+            string  name;                /** unique name of this type  */
+            int     resources;           /** resources to aquire per unit of time */
+            float   hyperlimitRadius;    /** radius of the hyperlimit in m */
+            float   outerHabitableRadius;/** outer radius of the habitable zone in m */
       };
 
       /** Forward definition */

@@ -16,9 +16,9 @@ import java.util.List;
  */
 public class SpherePositionCalculatorTest {
 
-    private static final double RADIUS = 100.0d;
-    private static final double MIN_DIST = 2.0d;
-    private static final double MAX_DIST = 7.5d;
+    private static final float RADIUS = 100.0f;
+    private static final float MIN_DIST = 2.0f;
+    private static final float MAX_DIST = 7.5f;
 
     private SpherePositionCalculator mCalculator;
     private List<Position> mPositions;
@@ -39,10 +39,10 @@ public class SpherePositionCalculatorTest {
 
     private static final List<Position> TWO_CLUSTER_POSITIONS = new ArrayList<Position>(
             Arrays.asList(
-                    new Position(0, -2.0d * MAX_DIST, MAX_DIST),
+                    new Position(0, -2.0f * MAX_DIST, MAX_DIST),
                     new Position(0, -MAX_DIST, MAX_DIST),
                     new Position(0 , MAX_DIST, 0),
-                    new Position(0, 2.0d*MAX_DIST, 0)
+                    new Position(0, 2.0f*MAX_DIST, 0)
             ));
 
 
