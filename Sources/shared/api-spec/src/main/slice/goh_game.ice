@@ -69,6 +69,12 @@ module ospgames {
              */
             space::StarSeq getStars(); 
 
+
+            /**
+             * Return the cluster of stars and wormholes.
+             */
+            space::StarCluster getCluster();
+
             /** Commented out to test Lobby with simple getStars method
             Player* joinLobby(string accountName, string password);
 

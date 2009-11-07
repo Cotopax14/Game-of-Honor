@@ -51,6 +51,7 @@ public class GohServer extends Ice.Application {
 
 
     public static final void main(String[] args) {
+
         GohServer server = new GohServer();
         System.exit(server.main("GohServer",args));
     }
