@@ -1,6 +1,8 @@
 package com.ospgames.goh.clientjava;
 
-import com.ospgames.goh.generic.Vector3D;
+import com.ospgames.goh.space.Star;
+import com.ospgames.goh.space.StarCluster;
+import com.ospgames.goh.space.StarType;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -14,15 +16,19 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.HashMap;
 import java.util.Random;
 
 
-public class ClientApplication
+public class ClientApplication extends IceClient
 {
     /** Game title */
     public static final String GAME_TITLE = "Game of Honor";
+    public static final String PARAM_FULLSCREEN = "fullscreen";
+    public static final String PARAM_USEICE = "useice";
 
     private boolean done = false;
+    private boolean iceAvailable = false;
     private boolean fullscreen = false;
     private final String windowTitle = GAME_TITLE;
     private boolean f1 = false;
@@ -35,18 +41,40 @@ public class ClientApplication
 	private float sceneDistance = 0;
     private DisplayMode displayMode;
 
-	//*****************************************************************************************************************
-
+    //*****************************************************************************************************************
     public static void main(String args[]) {
-        boolean fullscreen = false;
-        if(args.length>0) {
-            if(args[0].equalsIgnoreCase("fullscreen")) {
-                fullscreen = true;
+        ClientApplication app = new ClientApplication();
+
+        if (hasParameter(PARAM_USEICE, args)) {
+            // super class expects call to main to initialize ice.
+            System.exit(app.main(GAME_TITLE,args));
+        }
+        else {
+            app.run(hasParameter(PARAM_FULLSCREEN,args));
+        }
+    }
+
+    public static boolean hasParameter(String key, String[] args) {
+        for (String arg : args) {
+            if (arg.equalsIgnoreCase(key)) {
+                return true;
             }
         }
+        return false;
+    }
+    
+    //*****************************************************************************************************************
 
-        ClientApplication app = new ClientApplication();
-        app.run(fullscreen);
+    /**
+     * This method is called by super class when ice is initialized.
+     * @param args  command line parameter excluding the ice parameters.
+     * @return int that indicates normal 0 or error each other.
+     */
+    @Override
+    public int runWithinIceContainer(String[] args) {
+        iceAvailable = true;
+        run(hasParameter(PARAM_FULLSCREEN, args));
+        return 0;
     }
 
 	//*****************************************************************************************************************
@@ -221,12 +249,93 @@ public class ClientApplication
 	//*****************************************************************************************************************
     private void init() throws Exception {
         createWindow();
+        if (iceAvailable)
+            loadWorld();
+        else
+            createRandomWorld();
+
         initGL();
         initWorld();
     }
 
-	//*****************************************************************************************************************
-	private int numberOfStars = 100;
+    private void loadWorld() {
+        StarCluster cluster = getLobbyServicePrx().getCluster();
+
+        // we could use stars and wormholes to draw but for now i just
+        // convert them to the existing format
+        numberOfStars = cluster.stars.size();
+        starPositions = new float[numberOfStars][3];
+        starColors = new float[numberOfStars][3];
+        starsSelected = new int[numberOfStars];
+
+        int i=0;
+        for (Star star : cluster.stars) {
+            starPositions[i][0]=star.position.x;
+            starPositions[i][1]=star.position.y;
+            starPositions[i][2]=star.position.z;
+
+            // it might be a good idea to get colors from server
+            // so all clients can use the same colors
+            starColors[i]=getStarColor(star.type);
+            i++;
+        }
+
+        // TODO handle wormholes
+    }
+
+    private void createRandomWorld() {
+        int i;
+        Random generator = new Random(System.currentTimeMillis());
+        for (i=0;i<numberOfStars;i++){
+          starPositions[i][0] = generator.nextFloat()*100f-50f; //x positions
+          starPositions[i][1] = generator.nextFloat()*100f-50f; //y positions
+          starPositions[i][2] = -generator.nextFloat()*100f+5; //z positions
+
+          starColors[i][0] = generator.nextFloat();
+          starColors[i][1] = generator.nextFloat();
+          starColors[i][2] = generator.nextFloat();
+      }
+    }
+
+
+    public static final HashMap<String,float[]> STAR_COLORS ;
+    public static final float[] STARTYPE_COLOR_OTHER = { 155.0f, 155.0f, 155f};
+    static  {
+        // color codes from http://de.wikipedia.org/wiki/Spektralklasse
+        STAR_COLORS = new HashMap<String,float[]>();
+        STAR_COLORS.put("O",new float[] { 155f, 176f, 255f});
+        STAR_COLORS.put("B",new float[] { 170f, 191f, 255f});
+        STAR_COLORS.put("A",new float[] { 228f, 232f, 252f});
+        STAR_COLORS.put("F",new float[] { 249f, 250f, 231f});
+        STAR_COLORS.put("G",new float[] { 253f, 249f, 179f});
+        STAR_COLORS.put("K",new float[] { 255f, 216f, 112f});
+        STAR_COLORS.put("M",new float[] { 251f, 200f, 134f});
+
+        // normalize colors to the color range used by OpenGL 0..1
+        for (float[] colors : STAR_COLORS.values()) {
+            colors[0] = colors[0]/255f;
+            colors[1] = colors[1]/255f;
+            colors[2] = colors[2]/255f;
+        }
+    }
+
+    private float[] getStarColor(StarType type) {
+
+        float[] result=null;
+        if (type != null && STAR_COLORS.containsKey(type.name)) {
+            result = STAR_COLORS.get(type.name);
+        }
+
+        if (result == null ) {
+            result = STARTYPE_COLOR_OTHER;
+        }
+        return result;
+    }
+
+    //*****************************************************************************************************************
+
+
+    private int numberOfStars = 100;
 	private float starPositions[][]= new float[numberOfStars][3];
 	private float starColors[][]= new float[numberOfStars][3];
 	private int starsSelected[] = new int[numberOfStars];
@@ -237,25 +346,13 @@ public class ClientApplication
     private void initWorld() {
 	    int i;
 	    Sphere mSphere;
-	    Random generator = new Random(System.currentTimeMillis());
 
 		//generate spheres as stars
 
 	    mSphere = new Sphere();
 	    mSphere.setNormals(GL11.GL_SMOOTH);
         //mSphere.setTextureFlag(true);
-
-	  	for (i=0;i<numberOfStars;i++){
-			starPositions[i][0] = generator.nextFloat()*100f-50f; //x positions
-			starPositions[i][1] = generator.nextFloat()*100f-50f; //y positions
-			starPositions[i][2] = -generator.nextFloat()*100f+5; //z positions
-
-			starColors[i][0] = generator.nextFloat();
-			starColors[i][1] = generator.nextFloat();
-			starColors[i][2] = generator.nextFloat();
-		}
-
-	    // create display list for the star sphere
+        // create display list for the star sphere
 	    starSphere = GL11.glGenLists(1);
 	    GL11.glNewList(starSphere,GL11.GL_COMPILE);
 	    mSphere.draw(0.5f, 20, 10);
@@ -277,7 +374,9 @@ public class ClientApplication
 	    GL11.glEndList();
     }
 
-	//*****************************************************************************************************************
+
+
+    //*****************************************************************************************************************
     private void initGL() {
 
         float fogColor[] = {0.5f, 0.5f, 0.5f, 1.0f};        // Fog Color

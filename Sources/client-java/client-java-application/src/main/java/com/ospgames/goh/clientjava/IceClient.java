@@ -22,6 +22,8 @@ public class IceClient extends Ice.Application {
     private static final Log sLog = LogFactory.getLog(IceClient.class);
     private static final GohApiObjectFactory sObjectFactory = new GohApiObjectFactory();
 
+    private LobbyServicePrx mLobbyServicePrx = null;
+
     class ShutdownHook extends Thread
     {
         public void run()
@@ -40,7 +42,7 @@ public class IceClient extends Ice.Application {
         }
     }
 
-    public int run(String[] strings) {
+    public int run(String[] args) {
 
         //
         // Since this is an interactive demo we want to clear the
@@ -89,15 +91,26 @@ public class IceClient extends Ice.Application {
 
         if (lobbyServicePrx == null)
             throw new RuntimeException("Invalid lobby service proxy");
+        mLobbyServicePrx = lobbyServicePrx;
 
+
+        return runWithinIceContainer(args);
+    }
+
+    public int runWithinIceContainer(String[] args) {
         System.out.println("Stars: ");
-        for (Star star : lobbyServicePrx.getStars()) {
+        for (Star star : getLobbyServicePrx().getStars()) {
             System.out.println("Name: "+star.name+
                     " Position: ["+star.position.x+","+star.position.y+","+star.position.z+"]"+
                     " Type: "+star.type.name);
         }
-
         return 0;
+    }
+
+
+    protected LobbyServicePrx getLobbyServicePrx() {
+        if (mLobbyServicePrx == null) throw new IllegalStateException("Ice not initialized");
+        return mLobbyServicePrx;
     }
 
     private SessionPrx initializeRouterIfPresent(Communicator ic)
@@ -136,7 +149,7 @@ public class IceClient extends Ice.Application {
         }
         return null;
     }
-    public static final void main(String[] args) {
+    public static void main(String[] args) {
         IceClient client = new IceClient();
         System.exit(client.main("GohIceClient",args));
     }

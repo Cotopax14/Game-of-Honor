@@ -4,7 +4,9 @@ import Ice.ObjectFactory;
 import Ice.Communicator;
 import Ice.AlreadyRegisteredException;
 import com.ospgames.goh.space.Star;
+import com.ospgames.goh.space.StarCluster;
 import com.ospgames.goh.space.StarType;
+import com.ospgames.goh.space.Wormhole;
 
 
 /**
@@ -42,6 +44,8 @@ public class GohApiObjectFactory implements Ice.ObjectFactory {
     public static final Item[] Mappings = new Item[] {
         new Item(Star.class, Star.ice_staticId(), Star.ice_factory()),
         new Item(StarType.class, StarType.ice_staticId(), StarType.ice_factory()),
+        new Item(StarCluster.class, StarCluster.ice_staticId(), StarCluster.ice_factory()),
+        new Item(Wormhole.class, Wormhole.ice_staticId(), Wormhole.ice_factory())    
     };
 
 
