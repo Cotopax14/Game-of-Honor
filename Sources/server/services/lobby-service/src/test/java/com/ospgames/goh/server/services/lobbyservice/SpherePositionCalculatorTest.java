@@ -45,6 +45,30 @@ public class SpherePositionCalculatorTest {
                     new Position(0, 2.0f*MAX_DIST, 0)
             ));
 
+    private static final List<Position> THREE_CLUSTER_POSITIONS = new ArrayList<Position>(
+            Arrays.asList(
+                    // cluster 1
+                    new Position(-9f, -8f, 0),
+                    new Position(-7, -6, 0),
+                    new Position(-7, -8, 0),
+                    // cluster 2
+                    new Position( 2, 3, 0),
+                    new Position( 2, 6, 0),
+                    new Position( 3, 4, 0),
+                    new Position( 5, 4, 0),
+                    new Position( 5, 7, 0),
+                    new Position( 7, 7, 0),
+                    // cluster 3
+                    new Position( 4, -5, 0),
+                    new Position( 6, -4, 0),
+                    new Position( 7, -5, 0),
+                    new Position( 8, -3, 0),
+                    // cluster 1
+                    new Position(-9f, -4f, 0)
+            )
+    );
+
+
 
     @Before
     public void setUp() throws Exception {
@@ -253,8 +277,15 @@ public class SpherePositionCalculatorTest {
 
     @Test (timeout=120000)
     public void getConnectedRandomPositions_returnsConnectedGraph() {
-        assertSingleCluster(mCalculator.getConnectedRandomPositions(100), MAX_DIST);
+        assertSingleCluster(mCalculator.createConnectedRandomPositions(100, 1234), MAX_DIST);
     }
+
+    @Test (expected=AssertionError.class)
+    public void assertSingleCluster_assertThreeClusterPositions() {
+        assertSingleCluster(THREE_CLUSTER_POSITIONS, 3);
+    }
+
+
 
     private void assertSingleCluster(List<Position> positions, double maxDist) {
 

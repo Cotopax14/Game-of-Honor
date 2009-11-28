@@ -66,7 +66,8 @@ public class WorldGenerator {
     public List<Star> getStars() {
 
         SpherePositionCalculator posGen = new SpherePositionCalculator(mRadius, mMinDist, mMaxDist);
-        List<Position> positions = posGen.getRandomPositions(mNumberOfStars);
+        List<Position> positions = posGen.createConnectedRandomPositions(mNumberOfStars,1234);//getRandomPositions(mNumberOfStars);
+        posGen.isConnected(positions, mMaxDist);
         Iterator<String> names = mNames.iterator();
         Iterator<StarType> starTypes = mStarTypes.iterator();
 

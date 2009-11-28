@@ -1,9 +1,6 @@
 package com.ospgames.goh.server.services.lobbyservice;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Get a list of positions.
@@ -96,6 +93,84 @@ public class SpherePositionCalculator {
         return positions;
     }
 
+    public List<Position> createConnectedRandomPositions(int number, long seed) {
+
+        List<Position> result = new ArrayList<Position>(number);
+        Random r = new Random(seed);
+        int maxChainLength = 10;
+
+        result.add(getRandomPosition(r, mRadius / 4));
+
+        for (int i=1; i<number; i++) {
+
+            int remainingTries = 100;
+            Position nextPosition = null;
+            int currentChainLength = 0;
+            do {
+                if (remainingTries-- <=0) throw new IllegalStateException("To less space to place '"+number+"' positions");
+                Position randomBase;
+                if (currentChainLength <=0) {
+                    randomBase = result.get(r.nextInt(result.size()));
+                    currentChainLength = maxChainLength;
+                }
+                else {
+                    randomBase = nextPosition;
+                    currentChainLength--;
+                }
+                nextPosition = getRelativPosition(randomBase, r, result);
+            }
+            while (nextPosition == null);
+
+            result.add(nextPosition);
+        }
+
+        return result;
+    }
+
+    public static double TWO_PI = Math.PI * 2.0d;
+
+    private Position getRelativPosition(Position base, Random r, List<Position> existingPositions) {
+
+        int remainingTries = 100;
+        double dx, dy, dz;
+        do {
+
+            double distance = r.nextFloat()*(mMaxDist-mMinDist)+mMinDist;
+            double zrad = r.nextDouble()*TWO_PI/2;
+            double yrad = r.nextDouble()*TWO_PI/2;
+
+            double tanZrad = Math.tan(zrad);
+            double tanYrad = Math.tan(yrad);
+
+            dx = Math.sqrt( distance*distance/(1+tanZrad*tanZrad+tanYrad*tanYrad));
+            dy = dx * tanZrad;
+            dz = dx * tanYrad;
+
+            dx += base.x;
+            dy += base.y;
+            dz += base.z;
+
+            if (isInRadius(dx, dy, dz) && hasNoCollision(dx, dy, dz, existingPositions)) {
+                return new Position((float)dx, (float)dy, (float)dz);
+            }
+
+            remainingTries--;
+        }
+        while (remainingTries>0);
+
+        return null;
+    }
+
+    private Position getRandomPosition(Random r, double radius) {
+
+        double d = radius*2;
+        double x = r.nextFloat()*d-radius;
+        double y = r.nextFloat()*d-radius;
+        double z = r.nextFloat()*d-radius;
+
+        return new Position((float)x, (float)y, (float)z);
+    }
+
 
     /**
      * Shortcut that uses the current time to initialize the random generator.
@@ -115,7 +190,6 @@ public class SpherePositionCalculator {
         int i=0;
         do {
             positions = getRandomPositions(number);
-            System.out.println(i++);
         }
         while (! isConnected(positions, mMaxDist));
 
@@ -123,9 +197,10 @@ public class SpherePositionCalculator {
     }
 
     protected boolean isConnected(List<Position> positions, double maxDist) {
+        final int SINGLE_CLUSTER_ID = 1;
         // jede position gehört zu einem cluster von positionen die
         int[] clusters = new int[positions.size()];
-        int clusterId = 1;
+        int clusterId = SINGLE_CLUSTER_ID;
 
         for (int i=0; i<clusters.length; i++) {
             clusters[i] = Integer.MAX_VALUE;
@@ -160,7 +235,13 @@ public class SpherePositionCalculator {
             pos++;
         }
 
-        return clusters[positions.size()-1] == 1;
+        for (int id : clusters) {
+            if (id != SINGLE_CLUSTER_ID) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     boolean isInRadius( double x, double y, double z) {
